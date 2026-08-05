@@ -805,8 +805,13 @@
       kpis: {}
     };
 
-    // Al cargar la página, inicializa la app
-    window.addEventListener("load", () => {
+    // Función de inicialización de la aplicación
+    function initApp() {
+      if (window.appInitialized) return;
+      window.appInitialized = true;
+      
+      console.log("Inicializando aplicación...");
+      
       // Registrar manejadores de eventos programáticos para evitar bloqueos de CSP
       try {
         initEventListeners();
@@ -835,7 +840,15 @@
         loadMockData();
         renderAll();
       }
-    });
+    }
+
+    // Ejecutar inicialización inmediatamente si el documento ya está listo
+    if (document.readyState === "complete" || document.readyState === "interactive") {
+      initApp();
+    } else {
+      window.addEventListener("DOMContentLoaded", initApp);
+      window.addEventListener("load", initApp);
+    }
 
     // Cambiar de Pestaña (Tab Navigation)
     function switchTab(tabName) {
