@@ -807,6 +807,13 @@
 
     // Al cargar la página, inicializa la app
     window.addEventListener("load", () => {
+      // Registrar manejadores de eventos programáticos para evitar bloqueos de CSP
+      try {
+        initEventListeners();
+      } catch (e) {
+        console.error("Error al inicializar manejadores de eventos: ", e);
+      }
+      
       // Intentar conectarse a Google Apps Script
       if (typeof google !== "undefined" && google.script && google.script.run) {
         // Inicializa base de datos y carga datos
@@ -861,6 +868,59 @@
         cestas: "Control de Cestas"
       };
       document.getElementById("currentTabTitle").innerText = titles[tabName] || "Ecosistema";
+    }
+
+    // Inicializar manejadores de eventos programáticos (evita bloqueos CSP en iframes de Google)
+    function initEventListeners() {
+      // 1. Navegación lateral
+      const tabs = ["dashboard", "egresos", "ventas", "produccion", "inventario", "costos", "catalogo", "cestas"];
+      tabs.forEach(tab => {
+        const el = document.getElementById("nav-" + tab);
+        if (el) {
+          el.removeAttribute("onclick");
+          el.addEventListener("click", (e) => {
+            e.preventDefault();
+            switchTab(tab);
+          });
+        }
+      });
+
+      // Helper para adjuntar clicks quitando onclick inline
+      const attachClick = (selector, callback) => {
+        const el = document.querySelector(selector);
+        if (el) {
+          el.removeAttribute("onclick");
+          el.addEventListener("click", (e) => {
+            e.preventDefault();
+            callback(e);
+          });
+        }
+      };
+
+      // 2. Acciones rápidas y modales
+      attachClick("button[onclick*='modal-egreso']", () => openModal("modal-egreso"));
+      attachClick("button[onclick*='modal-venta']", () => openModal("modal-venta"));
+      attachClick("button[onclick*='modal-orden']", () => openModal("modal-orden"));
+      attachClick("button[onclick*='modal-harina-mesa']", () => openModal("modal-harina-mesa"));
+      attachClick("button[onclick*='modal-entrada-materia']", () => openModal("modal-entrada-materia"));
+      attachClick("button[onclick*='modal-cesta']", () => openModal("modal-cesta"));
+      attachClick("button[onclick*='abrirSimuladorPrecio']", () => openModal("modal-simulador"));
+      attachClick("button[onclick*='recalcularCostosBackend']", () => recalcularCostosBackend());
+      attachClick("button[onclick*='exportToFina']", () => exportToFina());
+
+      // 3. Botones de cerrar de todos los modales
+      document.querySelectorAll("button[onclick*='closeModal']").forEach(btn => {
+        const attr = btn.getAttribute("onclick");
+        const match = attr.match(/closeModal\('([^']+)'\)/);
+        if (match && match[1]) {
+          const modalId = match[1];
+          btn.removeAttribute("onclick");
+          btn.addEventListener("click", (e) => {
+            e.preventDefault();
+            closeModal(modalId);
+          });
+        }
+      });
     }
 
     // Modal helpers
