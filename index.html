@@ -784,9 +784,18 @@
   
   <script>
     // Captura de errores global para depuración en la nube
+    function logDebug(msg) {
+      const logEl = document.getElementById("debugLog");
+      if (logEl) {
+        logEl.innerText += "[" + new Date().toLocaleTimeString() + "] " + msg + "\n";
+        logEl.scrollTop = logEl.scrollHeight;
+      }
+      console.log(msg);
+    }
+
     window.onerror = function(message, source, lineno, colno, error) {
-      const errorMsg = "ERROR DE EJECUCIÓN:\n" + message + "\nLínea: " + lineno + "\nColumna: " + colno + "\nArchivo: " + source;
-      alert(errorMsg);
+      const errorMsg = "ERROR: " + message + " en línea " + lineno + ", col " + colno + " (" + source.split('/').pop() + ")";
+      logDebug(errorMsg);
       console.error(errorMsg);
       return false;
     };
@@ -810,33 +819,32 @@
       if (window.appInitialized) return;
       window.appInitialized = true;
       
-      console.log("Inicializando aplicación...");
+      logDebug("initApp() ejecutado. document.readyState = " + document.readyState);
       
       // Registrar manejadores de eventos programáticos para evitar bloqueos de CSP
       try {
         initEventListeners();
       } catch (e) {
-        console.error("Error al inicializar manejadores de eventos: ", e);
+        logDebug("ERROR en initEventListeners: " + e.message);
       }
       
       // Intentar conectarse a Google Apps Script
       if (typeof google !== "undefined" && google.script && google.script.run) {
-        // Inicializa base de datos y carga datos
+        logDebug("google.script.run detectado. Llamando apiInitDatabase...");
         google.script.run
           .withSuccessHandler((msg) => {
-            console.log(msg);
+            logDebug("Backend apiInitDatabase éxito: " + msg);
             refreshAllData();
           })
           .withFailureHandler((err) => {
-            console.error("apiInitDatabase failed: ", err);
+            logDebug("Backend apiInitDatabase FALLÓ: " + err.message);
             alert("Error al conectar con la base de datos de Google Sheets. Cargando modo demostración local. Error: " + err.message);
             loadMockData();
             renderAll();
           })
           .apiInitDatabase();
       } else {
-        // Carga de datos mock si se ejecuta localmente
-        console.log("Corriendo local sin entorno Google Apps Script.");
+        logDebug("Ejecutando localmente (sin Google Apps Script). Cargando mock data.");
         loadMockData();
         renderAll();
       }
@@ -852,39 +860,63 @@
 
     // Cambiar de Pestaña (Tab Navigation)
     function switchTab(tabName) {
-      // Ocultar todas las secciones
-      document.querySelectorAll("main section").forEach(section => {
-        section.classList.add("hidden");
-      });
-      // Mostrar la pestaña seleccionada
-      document.getElementById("tab-" + tabName).classList.remove("hidden");
-      
-      // Actualizar estilos del Sidebar
-      document.querySelectorAll("aside nav a").forEach(link => {
-        link.className = "flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-slate-100 transition-all duration-200";
-      });
-      
-      const activeLink = document.getElementById("nav-" + tabName);
-      if (activeLink) {
-        activeLink.className = "flex items-center gap-3 px-4 py-3 rounded-xl bg-amber-500 text-slate-950 font-medium transition-all duration-200 shadow-lg shadow-amber-500/10";
-      }
+      logDebug("Llamando a switchTab para: " + tabName);
+      try {
+        // Ocultar todas las secciones
+        let sectionsHidden = 0;
+        document.querySelectorAll("main section").forEach(section => {
+          section.classList.add("hidden");
+          sectionsHidden++;
+        });
+        logDebug("Ocultadas " + sectionsHidden + " secciones.");
+        
+        // Mostrar la pestaña seleccionada
+        const targetSection = document.getElementById("tab-" + tabName);
+        if (targetSection) {
+          targetSection.classList.remove("hidden");
+          logDebug("Sección tab-" + tabName + " mostrada con éxito.");
+        } else {
+          logDebug("ERROR: No se encontró la sección: tab-" + tabName);
+        }
+        
+        // Actualizar estilos del Sidebar
+        document.querySelectorAll("aside nav a").forEach(link => {
+          link.className = "flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-slate-100 transition-all duration-200";
+        });
+        
+        const activeLink = document.getElementById("nav-" + tabName);
+        if (activeLink) {
+          activeLink.className = "flex items-center gap-3 px-4 py-3 rounded-xl bg-amber-500 text-slate-950 font-medium transition-all duration-200 shadow-lg shadow-amber-500/10";
+          logDebug("Estilo activo aplicado a nav-" + tabName);
+        } else {
+          logDebug("ADVERTENCIA: No se encontró el botón nav-" + tabName);
+        }
 
-      // Actualizar título de la barra superior
-      const titles = {
-        dashboard: "Dashboard Hub",
-        egresos: "Compras & Egresos",
-        ventas: "Ventas & Facturas",
-        produccion: "Producción & Calculadora",
-        inventario: "Materias Primas",
-        costos: "Recetas & Costos",
-        catalogo: "Catálogo Marketing",
-        cestas: "Control de Cestas"
-      };
-      document.getElementById("currentTabTitle").innerText = titles[tabName] || "Ecosistema";
+        // Actualizar título de la barra superior
+        const titles = {
+          dashboard: "Dashboard Hub",
+          egresos: "Compras & Egresos",
+          ventas: "Ventas & Facturas",
+          produccion: "Producción & Calculadora",
+          inventario: "Materias Primas",
+          costos: "Recetas & Costos",
+          catalogo: "Catálogo Marketing",
+          cestas: "Control de Cestas"
+        };
+        const titleEl = document.getElementById("currentTabTitle");
+        if (titleEl) {
+          titleEl.innerText = titles[tabName] || "Ecosistema";
+        }
+        logDebug("Título actualizado a: " + (titles[tabName] || "Ecosistema"));
+      } catch (err) {
+        logDebug("ERROR CRÍTICO en switchTab: " + err.message);
+      }
     }
 
     // Inicializar manejadores de eventos programáticos (evita bloqueos CSP en iframes de Google)
     function initEventListeners() {
+      logDebug("Ejecutando initEventListeners...");
+      
       // 1. Navegación lateral
       const tabs = ["dashboard", "egresos", "ventas", "produccion", "inventario", "costos", "catalogo", "cestas"];
       tabs.forEach(tab => {
@@ -893,20 +925,32 @@
           el.removeAttribute("onclick");
           el.addEventListener("click", (e) => {
             e.preventDefault();
+            logDebug("Click detectado en nav-" + tab);
             switchTab(tab);
           });
+          logDebug("Vínculo nav-" + tab + " configurado.");
+        } else {
+          logDebug("ADVERTENCIA: No se encontró nav-" + tab);
         }
       });
 
       // Helper para adjuntar clicks quitando onclick inline
       const attachClick = (selector, callback) => {
-        const el = document.querySelector(selector);
-        if (el) {
-          el.removeAttribute("onclick");
-          el.addEventListener("click", (e) => {
-            e.preventDefault();
-            callback(e);
-          });
+        try {
+          const el = document.querySelector(selector);
+          if (el) {
+            el.removeAttribute("onclick");
+            el.addEventListener("click", (e) => {
+              e.preventDefault();
+              logDebug("Click detectado en selector " + selector);
+              callback(e);
+            });
+            logDebug("Evento click en selector " + selector + " configurado.");
+          } else {
+            logDebug("ADVERTENCIA: Selector no encontrado: " + selector);
+          }
+        } catch (e) {
+          logDebug("Error vinculando selector " + selector + ": " + e.message);
         }
       };
 
@@ -922,18 +966,26 @@
       attachClick("button[onclick*='exportToFina']", () => exportToFina());
 
       // 3. Botones de cerrar de todos los modales
+      let modalClosesAttached = 0;
       document.querySelectorAll("button[onclick*='closeModal']").forEach(btn => {
-        const attr = btn.getAttribute("onclick");
-        const match = attr.match(/closeModal\('([^']+)'\)/);
-        if (match && match[1]) {
-          const modalId = match[1];
-          btn.removeAttribute("onclick");
-          btn.addEventListener("click", (e) => {
-            e.preventDefault();
-            closeModal(modalId);
-          });
+        try {
+          const attr = btn.getAttribute("onclick");
+          const match = attr.match(/closeModal\('([^']+)'\)/);
+          if (match && match[1]) {
+            const modalId = match[1];
+            btn.removeAttribute("onclick");
+            btn.addEventListener("click", (e) => {
+              e.preventDefault();
+              logDebug("Click cerrar modal: " + modalId);
+              closeModal(modalId);
+            });
+            modalClosesAttached++;
+          }
+        } catch (e) {
+          logDebug("Error vinculando cerrar modal: " + e.message);
         }
       });
+      logDebug("Configurados " + modalClosesAttached + " botones de cierre de modales.");
     }
 
     // Modal helpers
@@ -1929,5 +1981,13 @@
       };
     }
   </script>
+  <!-- Floating Debug Log Panel -->
+  <div id="debugLogContainer" class="fixed bottom-4 right-4 w-96 bg-slate-900/95 backdrop-blur-md border border-slate-800 rounded-2xl p-4 shadow-2xl z-[9999]">
+    <div class="flex items-center justify-between mb-2 border-b border-slate-800 pb-1.5">
+      <h4 class="text-xs font-bold uppercase tracking-wider text-amber-500">Bitácora de Depuración (Apps Script)</h4>
+      <button onclick="document.getElementById('debugLogContainer').style.display='none'" class="text-slate-400 hover:text-white text-xs">Ocultar</button>
+    </div>
+    <pre id="debugLog" class="text-[10px] font-mono text-emerald-400 overflow-y-auto max-h-40 whitespace-pre-wrap select-text"></pre>
+  </div>
 </body>
 </html>
