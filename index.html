@@ -783,6 +783,14 @@
        ========================================== -->
   
   <script>
+    // Captura de errores global para depuración en la nube
+    window.onerror = function(message, source, lineno, colno, error) {
+      const errorMsg = "ERROR DE EJECUCIÓN:\n" + message + "\nLínea: " + lineno + "\nColumna: " + colno + "\nArchivo: " + source;
+      alert(errorMsg);
+      console.error(errorMsg);
+      return false;
+    };
+
     // Variables de estado
     let state = {
       tasaBcb: 36.5,
