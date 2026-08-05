@@ -1,0 +1,1830 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Degusta y Disfruta - Ecosistema Administrativo</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Outfit', sans-serif;
+    }
+    /* Glassmorphism utility */
+    .glass {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.5);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex custom-scrollbar">
+
+  <!-- SIDEBAR -->
+  <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0">
+    <!-- Logo/Brand -->
+    <div class="p-6 border-b border-slate-800 flex items-center gap-3">
+      <div class="h-10 w-10 bg-amber-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20">
+        <i class="fa-solid fa-bread-slice text-slate-950 text-xl"></i>
+      </div>
+      <div>
+        <h1 class="font-bold text-lg leading-none text-white">Degusta & Disfruta</h1>
+        <span class="text-xs text-slate-400">Ecosistema Digital</span>
+      </div>
+    </div>
+    
+    <!-- Role Selector & Session -->
+    <div class="px-6 py-4 border-b border-slate-800 bg-slate-900/50">
+      <label class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Permiso Actual</label>
+      <select id="userRole" onchange="applyRolePermissions()" class="mt-1 w-full bg-slate-950 border border-slate-800 rounded-lg py-1.5 px-2 text-xs text-slate-300 focus:outline-none focus:border-amber-500">
+        <option value="admin">Administrador (Total)</option>
+        <option value="planta">Operador Planta</option>
+        <option value="marketing">Marketing (Domi)</option>
+      </select>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="flex-1 p-4 space-y-1 overflow-y-auto custom-scrollbar">
+      <a href="#" onclick="switchTab('dashboard')" id="nav-dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-amber-500 text-slate-950 font-medium transition-all duration-200 shadow-lg shadow-amber-500/10">
+        <i class="fa-solid fa-chart-line text-lg w-5"></i>
+        <span>Dashboard Hub</span>
+      </a>
+      <a href="#" onclick="switchTab('egresos')" id="nav-egresos" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-slate-100 transition-all duration-200">
+        <i class="fa-solid fa-receipt text-lg w-5"></i>
+        <span>Compras & Egresos</span>
+      </a>
+      <a href="#" onclick="switchTab('ventas')" id="nav-ventas" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-slate-100 transition-all duration-200">
+        <i class="fa-solid fa-file-invoice-dollar text-lg w-5"></i>
+        <span>Ventas & Facturas</span>
+      </a>
+      <a href="#" onclick="switchTab('produccion')" id="nav-produccion" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-slate-100 transition-all duration-200">
+        <i class="fa-solid fa-calculator text-lg w-5"></i>
+        <span>Producción & Calculadora</span>
+      </a>
+      <a href="#" onclick="switchTab('inventario')" id="nav-inventario" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-slate-100 transition-all duration-200">
+        <i class="fa-solid fa-boxes-stacked text-lg w-5"></i>
+        <span>Materias Primas</span>
+      </a>
+      <a href="#" onclick="switchTab('costos')" id="nav-costos" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-slate-100 transition-all duration-200">
+        <i class="fa-solid fa-scale-balanced text-lg w-5"></i>
+        <span>Recetas & Costos</span>
+      </a>
+      <a href="#" onclick="switchTab('catalogo')" id="nav-catalogo" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-slate-100 transition-all duration-200">
+        <i class="fa-solid fa-shop text-lg w-5"></i>
+        <span>Catálogo Marketing</span>
+      </a>
+      <a href="#" onclick="switchTab('cestas')" id="nav-cestas" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-slate-100 transition-all duration-200">
+        <i class="fa-solid fa-basket-shopping text-lg w-5"></i>
+        <span>Control de Cestas</span>
+      </a>
+    </nav>
+    
+    <!-- Footer info -->
+    <div class="p-4 border-t border-slate-800 text-center">
+      <span class="text-[10px] text-slate-500">Tasa Dólar BCB Hoy:</span>
+      <div id="sidebar-tasa" class="text-sm font-semibold text-amber-500">Bs. --</div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="flex-1 flex flex-col min-h-screen overflow-hidden">
+    
+    <!-- TOP BAR -->
+    <header class="h-16 border-b border-slate-800 bg-slate-900/30 flex items-center justify-between px-8 shrink-0">
+      <div class="flex items-center gap-3">
+        <h2 id="currentTabTitle" class="text-xl font-bold text-white">Dashboard Hub</h2>
+      </div>
+      
+      <!-- Notifications / Sync -->
+      <div class="flex items-center gap-4">
+        <button onclick="refreshAllData()" title="Sincronizar Datos" class="flex items-center gap-2 px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-lg hover:bg-slate-800 text-xs transition">
+          <i id="syncIcon" class="fa-solid fa-arrows-rotate"></i>
+          <span>Sincronizar</span>
+        </button>
+        <div class="h-8 w-8 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700 text-amber-500 font-bold text-xs" title="Administrador Activo">
+          A
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT TABS -->
+    <div class="flex-1 overflow-y-auto p-8 custom-scrollbar">
+      
+      <!-- TAB: DASHBOARD -->
+      <section id="tab-dashboard" class="space-y-6">
+        <!-- KPI Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div class="bg-slate-900/60 p-6 rounded-2xl border border-slate-800 shadow-xl flex items-center justify-between">
+            <div>
+              <span class="text-slate-400 text-xs font-medium uppercase tracking-wider">Ventas del Día</span>
+              <h3 id="kpi-ventas-hoy" class="text-2xl font-bold text-white mt-1">$0.00</h3>
+              <p class="text-slate-500 text-[10px] mt-1">Total despachado hoy</p>
+            </div>
+            <div class="h-12 w-12 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-500 text-xl border border-emerald-500/20">
+              <i class="fa-solid fa-dollar-sign"></i>
+            </div>
+          </div>
+          
+          <div class="bg-slate-900/60 p-6 rounded-2xl border border-slate-800 shadow-xl flex items-center justify-between">
+            <div>
+              <span class="text-slate-400 text-xs font-medium uppercase tracking-wider">Egresos del Mes</span>
+              <h3 id="kpi-egresos-mes" class="text-2xl font-bold text-white mt-1">$0.00</h3>
+              <p class="text-slate-500 text-[10px] mt-1">Compras consolidadas</p>
+            </div>
+            <div class="h-12 w-12 bg-rose-500/10 rounded-xl flex items-center justify-center text-rose-500 text-xl border border-rose-500/20">
+              <i class="fa-solid fa-cart-shopping"></i>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/60 p-6 rounded-2xl border border-slate-800 shadow-xl flex items-center justify-between">
+            <div>
+              <span class="text-slate-400 text-xs font-medium uppercase tracking-wider">Por Cobrar Vencido</span>
+              <h3 id="kpi-cuentas-cobrar" class="text-2xl font-bold text-amber-500 mt-1">$0.00</h3>
+              <p class="text-slate-500 text-[10px] mt-1">Cruce de pagos pendiente</p>
+            </div>
+            <div class="h-12 w-12 bg-amber-500/10 rounded-xl flex items-center justify-center text-amber-500 text-xl border border-amber-500/20">
+              <i class="fa-solid fa-clock-rotate-left"></i>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/60 p-6 rounded-2xl border border-slate-800 shadow-xl flex items-center justify-between">
+            <div>
+              <span class="text-slate-400 text-xs font-medium uppercase tracking-wider">Cestas en Calle</span>
+              <h3 id="kpi-cestas-calle" class="text-2xl font-bold text-indigo-400 mt-1">0</h3>
+              <p class="text-slate-500 text-[10px] mt-1">Saldo en posesión de clientes</p>
+            </div>
+            <div class="h-12 w-12 bg-indigo-500/10 rounded-xl flex items-center justify-center text-indigo-400 text-xl border border-indigo-500/20">
+              <i class="fa-solid fa-truck-ramp-box"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dashboard Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Alertas del Sistema -->
+          <div class="bg-slate-900/60 p-6 rounded-2xl border border-slate-800 lg:col-span-2">
+            <h4 class="font-bold text-white text-lg mb-4 flex items-center gap-2">
+              <i class="fa-solid fa-triangle-exclamation text-amber-500"></i>
+              Alertas de Operación Críticas
+            </h4>
+            <div id="alertsContainer" class="space-y-3">
+              <!-- Creadas dinámicamente -->
+              <div class="text-slate-400 text-xs text-center py-6">No hay alertas activas en este momento. ¡Operaciones en orden!</div>
+            </div>
+          </div>
+
+          <!-- Accesos Rápidos Operativos -->
+          <div class="bg-slate-900/60 p-6 rounded-2xl border border-slate-800">
+            <h4 class="font-bold text-white text-lg mb-4">Acciones Rápidas</h4>
+            <div class="space-y-3">
+              <button onclick="openModal('modal-egreso')" class="w-full flex items-center gap-3 px-4 py-3 bg-slate-950 border border-slate-800 hover:border-amber-500 rounded-xl text-left text-sm hover:bg-slate-900 transition">
+                <div class="h-8 w-8 bg-rose-500/10 rounded-lg flex items-center justify-center text-rose-500"><i class="fa-solid fa-plus"></i></div>
+                <div>
+                  <div class="font-semibold text-white">Registrar Egreso</div>
+                  <div class="text-[10px] text-slate-400">Guardar factura y digitalizar soporte</div>
+                </div>
+              </button>
+
+              <button onclick="openModal('modal-venta')" class="w-full flex items-center gap-3 px-4 py-3 bg-slate-950 border border-slate-800 hover:border-amber-500 rounded-xl text-left text-sm hover:bg-slate-900 transition">
+                <div class="h-8 w-8 bg-emerald-500/10 rounded-lg flex items-center justify-center text-emerald-500"><i class="fa-solid fa-file-invoice"></i></div>
+                <div>
+                  <div class="font-semibold text-white">Generar Venta</div>
+                  <div class="text-[10px] text-slate-400">Crear nota de entrega institucional PDF</div>
+                </div>
+              </button>
+
+              <button onclick="openModal('modal-orden')" class="w-full flex items-center gap-3 px-4 py-3 bg-slate-950 border border-slate-800 hover:border-amber-500 rounded-xl text-left text-sm hover:bg-slate-900 transition">
+                <div class="h-8 w-8 bg-amber-500/10 rounded-lg flex items-center justify-center text-amber-500"><i class="fa-solid fa-calculator"></i></div>
+                <div>
+                  <div class="font-semibold text-white">Nueva Orden Producción</div>
+                  <div class="text-[10px] text-slate-400">Calcular porcentajes de masa y panadero</div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB: EGRESOS -->
+      <section id="tab-egresos" class="hidden space-y-6">
+        <div class="flex justify-between items-center">
+          <h3 class="text-lg font-bold text-white">Registro de Compras e Importación Contable</h3>
+          <div class="flex gap-2">
+            <button onclick="exportToFina()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm transition">
+              <i class="fa-solid fa-file-export mr-2"></i>Exportar para Fina
+            </button>
+            <button onclick="openModal('modal-egreso')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold rounded-xl text-sm transition">
+              <i class="fa-solid fa-plus mr-2"></i>Registrar Egreso
+            </button>
+          </div>
+        </div>
+        
+        <!-- Egresos Table -->
+        <div class="bg-slate-900/60 rounded-2xl border border-slate-800 overflow-hidden">
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-800/40 text-slate-300 text-xs font-semibold uppercase border-b border-slate-800">
+                  <th class="p-4">Fecha</th>
+                  <th class="p-4">Proveedor</th>
+                  <th class="p-4">Categoría</th>
+                  <th class="p-4">Monto USD</th>
+                  <th class="p-4">Monto VES</th>
+                  <th class="p-4">Cuenta Origen</th>
+                  <th class="p-4">Soporte</th>
+                  <th class="p-4 text-center">Estado</th>
+                  <th class="p-4 text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="egresosTableBody" class="text-xs divide-y divide-slate-800/40">
+                <!-- Carga dinámica -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB: VENTAS -->
+      <section id="tab-ventas" class="hidden space-y-6">
+        <div class="flex justify-between items-center">
+          <h3 class="text-lg font-bold text-white">Cobranza y Notas de Entrega PDF</h3>
+          <button onclick="openModal('modal-venta')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold rounded-xl text-sm transition">
+            <i class="fa-solid fa-plus mr-2"></i>Generar Venta
+          </button>
+        </div>
+        
+        <!-- Ventas Table -->
+        <div class="bg-slate-900/60 rounded-2xl border border-slate-800 overflow-hidden">
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-800/40 text-slate-300 text-xs font-semibold uppercase border-b border-slate-800">
+                  <th class="p-4">Fecha</th>
+                  <th class="p-4">Cliente</th>
+                  <th class="p-4">Monto USD</th>
+                  <th class="p-4">Abonado USD</th>
+                  <th class="p-4">Pendiente USD</th>
+                  <th class="p-4">Tasa BCB</th>
+                  <th class="p-4 text-center">Estado Cobro</th>
+                  <th class="p-4 text-center">PDF</th>
+                  <th class="p-4 text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="ventasTableBody" class="text-xs divide-y divide-slate-800/40">
+                <!-- Carga dinámica -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB: PRODUCCIÓN -->
+      <section id="tab-produccion" class="hidden space-y-6">
+        <div class="flex justify-between items-center">
+          <h3 class="text-lg font-bold text-white">Calculadora y Órdenes de Producción</h3>
+          <button onclick="openModal('modal-orden')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold rounded-xl text-sm transition">
+            <i class="fa-solid fa-plus mr-2"></i>Nueva Orden
+          </button>
+        </div>
+        
+        <!-- Órdenes de Producción Table -->
+        <div class="bg-slate-900/60 rounded-2xl border border-slate-800 overflow-hidden">
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-800/40 text-slate-300 text-xs font-semibold uppercase border-b border-slate-800">
+                  <th class="p-4">N° Orden</th>
+                  <th class="p-4">Fecha</th>
+                  <th class="p-4">Producto</th>
+                  <th class="p-4 text-center">Paquetes</th>
+                  <th class="p-4 text-center">Masa Total (kg)</th>
+                  <th class="p-4">Desglose Harina/Insumos</th>
+                  <th class="p-4 text-center">Estado</th>
+                  <th class="p-4 text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="ordenesTableBody" class="text-xs divide-y divide-slate-800/40">
+                <!-- Carga dinámica -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB: MATERIAS PRIMAS (INVENTARIO) -->
+      <section id="tab-inventario" class="hidden space-y-6">
+        <div class="flex justify-between items-center">
+          <h3 class="text-lg font-bold text-white">Control de Almacén, Auditoría y Mermas</h3>
+          <div class="flex gap-2">
+            <button onclick="openModal('modal-harina-mesa')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm transition">
+              <i class="fa-solid fa-bag-shopping mr-2"></i>Asignar Harina Mesa
+            </button>
+            <button onclick="openModal('modal-entrada-materia')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold rounded-xl text-sm transition">
+              <i class="fa-solid fa-plus mr-2"></i>Registrar Entrada
+            </button>
+          </div>
+        </div>
+        
+        <!-- Materias Primas Table -->
+        <div class="bg-slate-900/60 rounded-2xl border border-slate-800 overflow-hidden">
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-800/40 text-slate-300 text-xs font-semibold uppercase border-b border-slate-800">
+                  <th class="p-4">Fecha</th>
+                  <th class="p-4">Materia Prima</th>
+                  <th class="p-4">Tipo Movimiento</th>
+                  <th class="p-4 text-center">Cantidad (kg)</th>
+                  <th class="p-4 text-center">Costo Unitario ($/kg)</th>
+                  <th class="p-4 text-center">Peso Balanza (kg)</th>
+                  <th class="p-4 text-center">Faltante (kg)</th>
+                  <th class="p-4 text-center">Alerta Pérdida</th>
+                </tr>
+              </thead>
+              <tbody id="inventarioTableBody" class="text-xs divide-y divide-slate-800/40">
+                <!-- Carga dinámica -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB: COSTOS -->
+      <section id="tab-costos" class="hidden space-y-6">
+        <div class="flex justify-between items-center">
+          <h3 class="text-lg font-bold text-white">Estructura de Costos, Recetas y Sub-recetas</h3>
+          <div class="flex gap-2">
+            <button onclick="recalcularCostosBackend()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm transition">
+              <i class="fa-solid fa-arrows-rotate mr-2"></i>Recalcular Costos
+            </button>
+            <button onclick="openModal('modal-receta')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold rounded-xl text-sm transition">
+              <i class="fa-solid fa-plus mr-2"></i>Crear Receta
+            </button>
+          </div>
+        </div>
+        
+        <!-- Recetas list -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="recetasContainer">
+          <!-- Carga dinámica de recetas -->
+        </div>
+      </section>
+
+      <!-- TAB: CATALOGO -->
+      <section id="tab-catalogo" class="hidden space-y-6">
+        <div class="flex justify-between items-center">
+          <h3 class="text-lg font-bold text-white">Sincronizador para Marketing (Feed Sophie/Domi)</h3>
+          <button onclick="abrirSimuladorPrecio()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold rounded-xl text-sm transition">
+            <i class="fa-solid fa-chart-line mr-2"></i>Simulador Márgenes
+          </button>
+        </div>
+        
+        <!-- Productos y Precios Table -->
+        <div class="bg-slate-900/60 rounded-2xl border border-slate-800 overflow-hidden">
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-800/40 text-slate-300 text-xs font-semibold uppercase border-b border-slate-800">
+                  <th class="p-4">Producto</th>
+                  <th class="p-4">Empaque</th>
+                  <th class="p-4 text-center">Costo Unit. ($)</th>
+                  <th class="p-4 text-center">Precio Venta ($)</th>
+                  <th class="p-4 text-center">Precio Venta (VES)</th>
+                  <th class="p-4 text-center">Stock Disponible</th>
+                  <th class="p-4 text-center">Disponibilidad</th>
+                  <th class="p-4 text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="catalogoTableBody" class="text-xs divide-y divide-slate-800/40">
+                <!-- Carga dinámica -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB: CESTAS -->
+      <section id="tab-cestas" class="hidden space-y-6">
+        <div class="flex justify-between items-center">
+          <h3 class="text-lg font-bold text-white">Inventario de Cestas Plásticas de Despacho</h3>
+          <button onclick="openModal('modal-cesta')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold rounded-xl text-sm transition">
+            <i class="fa-solid fa-plus mr-2"></i>Registrar Cesta
+          </button>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Resumen de Deudas de Cestas -->
+          <div class="bg-slate-900/60 p-6 rounded-2xl border border-slate-800 lg:col-span-2 space-y-4">
+            <h4 class="font-bold text-white text-md">Saldos de Cestas adeudadas por Cliente</h4>
+            <div class="overflow-x-auto custom-scrollbar">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-800/20 text-slate-400 text-[10px] uppercase border-b border-slate-800">
+                    <th class="pb-3">Cliente</th>
+                    <th class="pb-3 text-center">Cestas Adeudadas</th>
+                    <th class="pb-3 text-center">Estatus</th>
+                  </tr>
+                </thead>
+                <tbody id="cestasDeudoresBody" class="text-xs divide-y divide-slate-800/20">
+                  <!-- Carga dinámica -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Historial de Cestas -->
+          <div class="bg-slate-900/60 p-6 rounded-2xl border border-slate-800 space-y-4">
+            <h4 class="font-bold text-white text-md">Historial de Salidas / Retornos</h4>
+            <div id="cestasHistorial" class="space-y-3 overflow-y-auto max-h-96 custom-scrollbar text-xs">
+              <!-- Carga dinámica -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ==========================================
+       MODALS COMPONENT
+       ========================================== -->
+  
+  <!-- MODAL: REGISTRAR EGRESO -->
+  <div id="modal-egreso" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg p-6 space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h4 class="text-lg font-bold text-white">Registrar Gasto o Egreso de Planta</h4>
+        <button onclick="closeModal('modal-egreso')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form id="egresoForm" onsubmit="handleEgresoSubmit(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block text-slate-400 mb-1">Proveedor</label>
+          <input type="text" id="egreso-proveedor" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-amber-500">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-slate-400 mb-1">Categoría</label>
+            <select id="egreso-categoria" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-amber-500">
+              <option value="Materia Prima">Materia Prima</option>
+              <option value="Mantenimiento/Infraestructura">Mantenimiento/Infraestructura</option>
+              <option value="Servicios">Servicios</option>
+              <option value="Gastos Administrativos">Gastos Administrativos</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Cuenta de Origen</label>
+            <select id="egreso-cuenta" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-amber-500">
+              <option value="Caja Chica Efectivo">Caja Chica Efectivo</option>
+              <option value="Banesco Cuenta Jurídica">Banesco Cuenta Jurídica</option>
+              <option value="Banca Amiga">Banca Amiga</option>
+              <option value="Banco de Venezuela">Banco de Venezuela</option>
+              <option value="Cuenta Personal">Cuenta Personal</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-slate-400 mb-1">Monto en Dólares ($ USD)</label>
+            <input type="number" id="egreso-monto-usd" step="0.01" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Monto en Bolívares (VES)</label>
+            <input type="number" id="egreso-monto-ves" step="0.01" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-amber-500">
+          </div>
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1">Descripción Detallada</label>
+          <textarea id="egreso-descripcion" required rows="2" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-amber-500"></textarea>
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1">Foto del Soporte (Factura/Comprobante)</label>
+          <input type="file" id="egreso-foto" accept="image/*" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-400 focus:outline-none focus:border-amber-500">
+        </div>
+        
+        <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
+          <button type="button" onclick="closeModal('modal-egreso')" class="px-4 py-2 border border-slate-800 rounded-xl text-slate-400 hover:text-white transition">Cancelar</button>
+          <button type="submit" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold rounded-xl transition">Guardar Egreso</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: REGISTRAR VENTA -->
+  <div id="modal-venta" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-xl p-6 space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h4 class="text-lg font-bold text-white">Generar Venta y Nota de Entrega</h4>
+        <button onclick="closeModal('modal-venta')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form id="ventaForm" onsubmit="handleVentaSubmit(event)" class="space-y-4 text-xs">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-slate-400 mb-1">Cliente</label>
+            <select id="venta-cliente" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-amber-500">
+              <!-- Cargado dinámicamente -->
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Tasa Oficial</label>
+            <input type="text" id="venta-tasa-preview" disabled class="w-full bg-slate-950/50 border border-slate-800 rounded-lg p-2 text-slate-500">
+          </div>
+        </div>
+        
+        <!-- Dynamic Product list for ordering -->
+        <div>
+          <label class="block text-slate-400 mb-1">Seleccionar Productos</label>
+          <div id="ventaProductosGrid" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar bg-slate-950 border border-slate-800 p-3 rounded-lg">
+            <!-- Cargado dinámicamente con checkboxes y campos de cantidad -->
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
+          <button type="button" onclick="closeModal('modal-venta')" class="px-4 py-2 border border-slate-800 rounded-xl text-slate-400 hover:text-white transition">Cancelar</button>
+          <button type="submit" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold rounded-xl transition">Emitir y Generar PDF</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: REGISTRAR ORDEN DE PRODUCCIÓN -->
+  <div id="modal-orden" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg p-6 space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h4 class="text-lg font-bold text-white">Generar Cálculo de Orden de Producción</h4>
+        <button onclick="closeModal('modal-orden')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form id="ordenForm" onsubmit="handleOrdenSubmit(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block text-slate-400 mb-1">Producto a Producir</label>
+          <select id="orden-producto" required onchange="actualizarCalculoProduccionPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-amber-500">
+            <!-- Cargado dinámicamente -->
+          </select>
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1">Cantidad de Paquetes Requeridos</label>
+          <input type="number" id="orden-paquetes" required oninput="actualizarCalculoProduccionPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-amber-500">
+        </div>
+        
+        <!-- Production Breakdown Preview -->
+        <div id="ordenCalculoPreview" class="bg-slate-950 border border-slate-800 p-4 rounded-lg hidden space-y-2">
+          <div class="flex justify-between text-xs font-semibold border-b border-slate-800 pb-1.5 text-white">
+            <span>Masa Total Estimada:</span>
+            <span id="preview-masa-total" class="text-amber-500">0.00 kg</span>
+          </div>
+          <div class="space-y-1" id="preview-ingredientes-list">
+            <!-- Desglose de gramos dinámico -->
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
+          <button type="button" onclick="closeModal('modal-orden')" class="px-4 py-2 border border-slate-800 rounded-xl text-slate-400 hover:text-white transition">Cancelar</button>
+          <button type="submit" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold rounded-xl transition">Enviar a Planta</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: REGISTRAR ENTRADA MATERIA PRIMA (Sacos) -->
+  <div id="modal-entrada-materia" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h4 class="text-lg font-bold text-white">Ingreso de Materia Prima y Pesaje</h4>
+        <button onclick="closeModal('modal-entrada-materia')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form id="entradaMateriaForm" onsubmit="handleEntradaMateriaSubmit(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block text-slate-400 mb-1">Materia Prima / Ingrediente</label>
+          <input type="text" id="entrada-ingrediente" placeholder="Ej: Harina de Trigo, Levadura, Manteca" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-amber-500">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-slate-400 mb-1">Peso Ficha Proveedor (kg)</label>
+            <input type="number" id="entrada-peso-nominal" step="0.01" placeholder="Ej: 45" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Peso Balanza Planta (kg)</label>
+            <input type="number" id="entrada-peso-real" step="0.01" placeholder="Ej: 44.2" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-amber-500">
+          </div>
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1">Costo Unitario ($ por kg)</label>
+          <input type="number" id="entrada-costo" step="0.01" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-amber-500">
+        </div>
+        
+        <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
+          <button type="button" onclick="closeModal('modal-entrada-materia')" class="px-4 py-2 border border-slate-800 rounded-xl text-slate-400 hover:text-white transition">Cancelar</button>
+          <button type="submit" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold rounded-xl transition">Guardar Entrada</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ASIGNAR HARINA DE MESA -->
+  <div id="modal-harina-mesa" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h4 class="text-lg font-bold text-white">Asignación de Harina para Sobadora (Mesa)</h4>
+        <button onclick="closeModal('modal-harina-mesa')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form id="harinaMesaForm" onsubmit="handleHarinaMesaSubmit(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block text-slate-400 mb-1">Cantidad Asignada (kg)</label>
+          <input type="number" id="mesa-cantidad" step="0.1" placeholder="Ej: 4.0" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-amber-500">
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1">Descripción / Frecuencia</label>
+          <input type="text" id="mesa-descripcion" placeholder="Ej: Tobo de harina para 15 días" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-amber-500">
+        </div>
+        
+        <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
+          <button type="button" onclick="closeModal('modal-harina-mesa')" class="px-4 py-2 border border-slate-800 rounded-xl text-slate-400 hover:text-white transition">Cancelar</button>
+          <button type="submit" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold rounded-xl transition">Confirmar Asignación</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: REGISTRAR CESTA -->
+  <div id="modal-cesta" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h4 class="text-lg font-bold text-white">Registro de Salida/Retorno de Cestas</h4>
+        <button onclick="closeModal('modal-cesta')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form id="cestaForm" onsubmit="handleCestaSubmit(event)" class="space-y-4 text-xs">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-slate-400 mb-1">Tipo de Movimiento</label>
+            <select id="cesta-tipo" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-amber-500">
+              <option value="Salida">Salida (Entrega al Cliente)</option>
+              <option value="Retorno">Retorno (Devolución a Planta)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Chofer / Ruta</label>
+            <select id="cesta-chofer" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-amber-500">
+              <option value="Sr. Gallardo">Sr. Gallardo</option>
+              <option value="Jorge">Jorge</option>
+              <option value="Otro">Otro/Particular</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1">Cliente Vinculado</label>
+          <select id="cesta-cliente" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-amber-500">
+            <!-- Cargado dinámicamente -->
+          </select>
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1">Cantidad de Cestas</label>
+          <input type="number" id="cesta-cantidad" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-amber-500">
+        </div>
+        
+        <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
+          <button type="button" onclick="closeModal('modal-cesta')" class="px-4 py-2 border border-slate-800 rounded-xl text-slate-400 hover:text-white transition">Cancelar</button>
+          <button type="submit" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold rounded-xl transition">Guardar Movimiento</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: REGISTRAR ABONO (CRUCE) -->
+  <div id="modal-cruce" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm p-6 space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h4 class="text-lg font-bold text-white">Registrar Abono / Cruce Pago</h4>
+        <button onclick="closeModal('modal-cruce')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form id="cruceForm" onsubmit="handleCruceSubmit(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="cruce-venta-id">
+        <div>
+          <label class="block text-slate-400 mb-1">Detalle de Factura</label>
+          <div id="cruce-factura-detalle" class="bg-slate-950 p-3 rounded-lg text-slate-300 font-semibold"></div>
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1">Monto a Registrar ($ USD)</label>
+          <input type="number" id="cruce-monto-usd" step="0.01" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-amber-500">
+        </div>
+        
+        <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
+          <button type="button" onclick="closeModal('modal-cruce')" class="px-4 py-2 border border-slate-800 rounded-xl text-slate-400 hover:text-white transition">Cancelar</button>
+          <button type="submit" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold rounded-xl transition">Confirmar Abono</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: SIMULADOR DE PRECIOS -->
+  <div id="modal-simulador" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h4 class="text-lg font-bold text-white">Simulador de Margen de Ganancia</h4>
+        <button onclick="closeModal('modal-simulador')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form id="simuladorForm" onsubmit="handleSimulacion(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block text-slate-400 mb-1">Producto a Evaluar</label>
+          <select id="sim-producto" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-amber-500">
+            <!-- Cargado dinámicamente -->
+          </select>
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1">Margen Objetivo (%)</label>
+          <input type="number" id="sim-margen" placeholder="Ej: 40" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-amber-500">
+        </div>
+        
+        <!-- Simulated Price Output -->
+        <div id="simuladorResult" class="bg-slate-950 border border-slate-800 p-4 rounded-lg hidden space-y-2">
+          <div class="flex justify-between text-xs text-slate-300">
+            <span>Costo de Producción:</span>
+            <span id="sim-costo-val" class="font-bold text-white">$0.00</span>
+          </div>
+          <div class="flex justify-between text-xs text-slate-300">
+            <span>Precio Sugerido USD:</span>
+            <span id="sim-sug-usd" class="font-bold text-emerald-400">$0.00</span>
+          </div>
+          <div class="flex justify-between text-xs text-slate-300">
+            <span>Precio Sugerido VES:</span>
+            <span id="sim-sug-ves" class="font-bold text-amber-500">Bs. 0.00</span>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
+          <button type="button" onclick="closeModal('modal-simulador')" class="px-4 py-2 border border-slate-800 rounded-xl text-slate-400 hover:text-white transition">Cerrar</button>
+          <button type="submit" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold rounded-xl transition">Simular Costo</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       JAVASCRIPT APP LOGIC
+       ========================================== -->
+  
+  <script>
+    // Variables de estado
+    let state = {
+      tasaBcb: 36.5,
+      egresos: [],
+      ventas: [],
+      productos: [],
+      clientes: [],
+      recetas: [],
+      ordenes: [],
+      inventario: [],
+      cestas: [],
+      kpis: {}
+    };
+
+    // Al cargar la página, inicializa la app
+    window.addEventListener("load", () => {
+      // Intentar conectarse a Google Apps Script
+      if (typeof google !== "undefined" && google.script && google.script.run) {
+        // Inicializa base de datos y carga datos
+        google.script.run.withSuccessHandler((msg) => {
+          console.log(msg);
+          refreshAllData();
+        }).apiInitDatabase();
+      } else {
+        // Carga de datos mock si se ejecuta localmente
+        console.log("Corriendo local sin entorno Google Apps Script.");
+        loadMockData();
+        renderAll();
+      }
+    });
+
+    // Cambiar de Pestaña (Tab Navigation)
+    function switchTab(tabName) {
+      // Ocultar todas las secciones
+      document.querySelectorAll("main section").forEach(section => {
+        section.classList.add("hidden");
+      });
+      // Mostrar la pestaña seleccionada
+      document.getElementById("tab-" + tabName).classList.remove("hidden");
+      
+      // Actualizar estilos del Sidebar
+      document.querySelectorAll("aside nav a").forEach(link => {
+        link.className = "flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-slate-100 transition-all duration-200";
+      });
+      
+      const activeLink = document.getElementById("nav-" + tabName);
+      if (activeLink) {
+        activeLink.className = "flex items-center gap-3 px-4 py-3 rounded-xl bg-amber-500 text-slate-950 font-medium transition-all duration-200 shadow-lg shadow-amber-500/10";
+      }
+
+      // Actualizar título de la barra superior
+      const titles = {
+        dashboard: "Dashboard Hub",
+        egresos: "Compras & Egresos",
+        ventas: "Ventas & Facturas",
+        produccion: "Producción & Calculadora",
+        inventario: "Materias Primas",
+        costos: "Recetas & Costos",
+        catalogo: "Catálogo Marketing",
+        cestas: "Control de Cestas"
+      };
+      document.getElementById("currentTabTitle").innerText = titles[tabName] || "Ecosistema";
+    }
+
+    // Modal helpers
+    function openModal(modalId) {
+      const modal = document.getElementById(modalId);
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    }
+
+    function closeModal(modalId) {
+      const modal = document.getElementById(modalId);
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
+
+    // Role management
+    function applyRolePermissions() {
+      const role = document.getElementById("userRole").value;
+      console.log("Aplicando rol: " + role);
+      // Ocultar/deshabilitar botones según el rol
+      const adminElements = document.querySelectorAll(".admin-only");
+      const plantaElements = document.querySelectorAll(".planta-only");
+      
+      if (role === "admin") {
+        document.querySelectorAll("button").forEach(b => b.disabled = false);
+      } else if (role === "planta") {
+        // Planta no edita compras ni ventas
+        document.getElementById("nav-egresos").style.display = "none";
+        document.getElementById("nav-ventas").style.display = "none";
+      } else if (role === "marketing") {
+        // Marketing solo lee catálogo
+        document.getElementById("nav-egresos").style.display = "none";
+        document.getElementById("nav-ventas").style.display = "none";
+        document.getElementById("nav-produccion").style.display = "none";
+        document.getElementById("nav-inventario").style.display = "none";
+        document.getElementById("nav-cestas").style.display = "none";
+      }
+    }
+
+    // Sincronizar datos con Google Sheets (Backend)
+    function refreshAllData() {
+      if (typeof google === "undefined") return;
+      
+      const syncIcon = document.getElementById("syncIcon");
+      syncIcon.classList.add("fa-spin");
+      
+      let pendingRequests = 9;
+      
+      const checkDone = () => {
+        pendingRequests--;
+        if (pendingRequests === 0) {
+          syncIcon.classList.remove("fa-spin");
+          renderAll();
+        }
+      };
+
+      google.script.run.withSuccessHandler((rate) => {
+        state.tasaBcb = rate;
+        document.getElementById("sidebar-tasa").innerText = "Bs. " + rate.toFixed(4);
+        checkDone();
+      }).apiGetBcbRate();
+
+      google.script.run.withSuccessHandler((kpis) => {
+        state.kpis = kpis;
+        checkDone();
+      }).apiGetDashboardKPIs();
+
+      const sheets = ["Egresos", "Ventas", "Productos", "Clientes", "Recetas", "OrdenesProduccion", "Inventario", "Cestas"];
+      sheets.forEach(sheetName => {
+        google.script.run.withSuccessHandler((data) => {
+          state[sheetName.toLowerCase()] = data;
+          checkDone();
+        }).apiReadAll(sheetName);
+      });
+    }
+
+    // Renderizar todas las tablas e información
+    function renderAll() {
+      renderDashboard();
+      renderEgresos();
+      renderVentas();
+      renderProduccion();
+      renderInventario();
+      renderCostos();
+      renderCatalogo();
+      renderCestas();
+      
+      // Llenar selectores dinámicos
+      populateDropdowns();
+    }
+
+    function renderDashboard() {
+      document.getElementById("kpi-ventas-hoy").innerText = "$" + (parseFloat(state.kpis.ventasHoyUSD) || 0).toFixed(2);
+      document.getElementById("kpi-egresos-mes").innerText = "$" + (parseFloat(state.kpis.egresosMesUSD) || 0).toFixed(2);
+      document.getElementById("kpi-cuentas-cobrar").innerText = "$" + (parseFloat(state.kpis.pendientesCobroUSD) || 0).toFixed(2);
+      document.getElementById("kpi-cestas-calle").innerText = state.kpis.cestasCalle || 0;
+      
+      // Alertas de mermas e inventarios bajos
+      const alerts = [];
+      
+      // 1. Alertas de inventario bajo de ingredientes
+      const materiaPrimaTotales = {};
+      state.inventario.forEach(mov => {
+        const cant = parseFloat(mov.cantidad_kg) || 0;
+        materiaPrimaTotales[mov.ingrediente] = (materiaPrimaTotales[mov.ingrediente] || 0) + cant;
+      });
+      
+      for (const ing in materiaPrimaTotales) {
+        if (materiaPrimaTotales[ing] < 20 && ing !== "Harina de Mesa / Espolvorear") {
+          alerts.push({
+            type: "warning",
+            msg: `Stock crítico de <b>${ing}</b>: Solo quedan ${materiaPrimaTotales[ing].toFixed(1)} kg en almacén.`
+          });
+        }
+      }
+
+      // 2. Alertas de deudas de cestas (> 50 cestas)
+      state.clientes.forEach(c => {
+        const cestas = parseInt(c.cestas_deudas) || 0;
+        if (cestas >= 50) {
+          alerts.push({
+            type: "danger",
+            msg: `El cliente <b>${c.nombre}</b> adeuda <b>${cestas}</b> cestas de despacho. Se recomienda recolección urgente.`
+          });
+        }
+      });
+
+      // 3. Alertas de mermas/pesajes de sacos
+      state.inventario.forEach(mov => {
+        if (mov.alerta_proveedor && mov.alerta_proveedor.startsWith("SÍ")) {
+          alerts.push({
+            type: "info",
+            msg: `Merma en entrega: Saco de <b>${mov.ingrediente}</b> ingresó con una merma física de ${parseFloat(mov.diferencia_kg).toFixed(2)} kg.`
+          });
+        }
+      });
+
+      const alertsContainer = document.getElementById("alertsContainer");
+      if (alerts.length === 0) {
+        alertsContainer.innerHTML = `<div class="text-slate-400 text-xs text-center py-6">No hay alertas activas en este momento. ¡Operaciones en orden!</div>`;
+      } else {
+        alertsContainer.innerHTML = alerts.map(a => {
+          let bgClass = "bg-slate-900 border-slate-800 text-slate-300";
+          let icon = "fa-info-circle text-blue-400";
+          
+          if (a.type === "warning") {
+            bgClass = "bg-amber-500/5 border-amber-500/20 text-amber-200";
+            icon = "fa-triangle-exclamation text-amber-500";
+          } else if (a.type === "danger") {
+            bgClass = "bg-rose-500/5 border-rose-500/20 text-rose-200";
+            icon = "fa-circle-xmark text-rose-500";
+          }
+          
+          return `
+            <div class="flex items-start gap-3 p-3.5 border rounded-xl ${bgClass}">
+              <i class="fa-solid ${icon} mt-0.5 text-base"></i>
+              <span class="text-xs">${a.msg}</span>
+            </div>
+          `;
+        }).join("");
+      }
+    }
+
+    function renderEgresos() {
+      const body = document.getElementById("egresosTableBody");
+      if (state.egresos.length === 0) {
+        body.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-500">No hay egresos registrados.</td></tr>`;
+        return;
+      }
+      
+      body.innerHTML = state.egresos.map(e => {
+        let badgeColor = "bg-amber-500/10 text-amber-400 border border-amber-500/20";
+        if (e.estado_aprobacion === "Aprobado") badgeColor = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+        else if (e.estado_aprobacion === "Rechazado") badgeColor = "bg-rose-500/10 text-rose-400 border border-rose-500/20";
+        
+        let actionButtons = "";
+        if (e.estado_aprobacion === "Pendiente") {
+          actionButtons = `
+            <button onclick="approveEgreso('${e.id}')" class="text-emerald-500 hover:text-emerald-400 font-medium mr-2">Aprobar</button>
+            <button onclick="rejectEgreso('${e.id}')" class="text-rose-500 hover:text-rose-400 font-medium">Rechazar</button>
+          `;
+        }
+        
+        return `
+          <tr>
+            <td class="p-4 text-slate-300">${e.fecha}</td>
+            <td class="p-4 font-semibold text-white">${e.proveedor}</td>
+            <td class="p-4 text-slate-400">${e.categoria}</td>
+            <td class="p-4 text-white">$${parseFloat(e.monto_usd).toFixed(2)}</td>
+            <td class="p-4 text-slate-300">Bs. ${parseFloat(e.monto_ves).toLocaleString()}</td>
+            <td class="p-4 text-slate-400">${e.cuenta_origen}</td>
+            <td class="p-4">
+              ${e.foto_soporte_url ? `<a href="${e.foto_soporte_url}" target="_blank" class="text-amber-500 hover:underline"><i class="fa-solid fa-image mr-1"></i>Ver foto</a>` : "S/S"}
+            </td>
+            <td class="p-4 text-center">
+              <span class="px-2 py-1 rounded-full text-[10px] font-semibold ${badgeColor}">${e.estado_aprobacion}</span>
+            </td>
+            <td class="p-4 text-right">${actionButtons}</td>
+          </tr>
+        `;
+      }).reverse().join("");
+    }
+
+    function renderVentas() {
+      const body = document.getElementById("ventasTableBody");
+      if (state.ventas.length === 0) {
+        body.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-500">No hay ventas registradas.</td></tr>`;
+        return;
+      }
+      
+      body.innerHTML = state.ventas.map(v => {
+        let badgeColor = "bg-amber-500/10 text-amber-400 border border-amber-500/20";
+        if (v.estado_cobro === "Cobrado") badgeColor = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+        else if (v.estado_cobro === "Abonado Parcial") badgeColor = "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20";
+        
+        const client = state.clientes.find(c => c.id === v.cliente_id) || { nombre: "Cliente General" };
+        const abono = parseFloat(v.monto_abonado || 0);
+        const total = parseFloat(v.monto_usd) || 0;
+        const pend = total - abono;
+        
+        let actionButtons = "";
+        if (v.estado_cobro !== "Cobrado") {
+          actionButtons = `
+            <button onclick="openCruceModal('${v.id}', '${client.nombre}', ${pend})" class="text-amber-500 hover:text-amber-400 font-semibold">Registrar Pago</button>
+          `;
+        }
+        
+        return `
+          <tr>
+            <td class="p-4 text-slate-300">${v.fecha}</td>
+            <td class="p-4 font-semibold text-white">${client.nombre}</td>
+            <td class="p-4 text-white">$${total.toFixed(2)}</td>
+            <td class="p-4 text-slate-300">$${abono.toFixed(2)}</td>
+            <td class="p-4 text-amber-500 font-semibold">$${pend.toFixed(2)}</td>
+            <td class="p-4 text-slate-400">Bs. ${parseFloat(v.tasa_oficial).toFixed(2)}</td>
+            <td class="p-4 text-center">
+              <span class="px-2 py-1 rounded-full text-[10px] font-semibold ${badgeColor}">${v.estado_cobro}</span>
+            </td>
+            <td class="p-4 text-center">
+              ${v.pdf_url && v.pdf_url.startsWith("http") ? `<a href="${v.pdf_url}" target="_blank" class="text-rose-500 hover:underline"><i class="fa-solid fa-file-pdf text-base"></i></a>` : "Pendiente"}
+            </td>
+            <td class="p-4 text-right">${actionButtons}</td>
+          </tr>
+        `;
+      }).reverse().join("");
+    }
+
+    function renderProduccion() {
+      const body = document.getElementById("ordenesTableBody");
+      if (state.ordenesproduction.length === 0) {
+        body.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-500">No hay órdenes de producción registradas.</td></tr>`;
+        return;
+      }
+      
+      body.innerHTML = state.ordenesproduction.map(o => {
+        let badgeColor = "bg-amber-500/10 text-amber-400 border border-amber-500/20";
+        if (o.estado === "Completado") badgeColor = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+        else if (o.estado === "En Planta") badgeColor = "bg-blue-500/10 text-blue-400 border border-blue-500/20";
+        
+        const prod = state.productos.find(p => p.id === o.producto_id) || { nombre: "Pan" };
+        const desglose = JSON.parse(o.ingredientes_gramos || "[]");
+        const desgloseStr = desglose.map(d => `${d.ingrediente}: ${d.gramos}g`).join(", ");
+        
+        let actionButtons = "";
+        if (o.estado === "Pendiente") {
+          actionButtons = `<button onclick="updateOrderStatus('${o.id}', 'En Planta')" class="text-blue-400 hover:text-blue-300 mr-2">Iniciar</button>`;
+        } else if (o.estado === "En Planta") {
+          actionButtons = `<button onclick="updateOrderStatus('${o.id}', 'Completado')" class="text-emerald-500 hover:text-emerald-400 font-semibold mr-2">Completar</button>`;
+        }
+        
+        return `
+          <tr>
+            <td class="p-4 font-mono font-bold text-white">#${o.id.substring(0, 5).toUpperCase()}</td>
+            <td class="p-4 text-slate-300">${o.fecha}</td>
+            <td class="p-4 font-semibold text-white">${prod.nombre}</td>
+            <td class="p-4 text-center font-bold text-slate-200">${o.paquetes_requeridos} paq</td>
+            <td class="p-4 text-center text-amber-500 font-semibold">${o.masa_total_kg} kg</td>
+            <td class="p-4 text-slate-400 max-w-xs truncate" title="${desgloseStr}">${desgloseStr}</td>
+            <td class="p-4 text-center">
+              <span class="px-2 py-1 rounded-full text-[10px] font-semibold ${badgeColor}">${o.estado}</span>
+            </td>
+            <td class="p-4 text-right">${actionButtons}</td>
+          </tr>
+        `;
+      }).reverse().join("");
+    }
+
+    function renderInventario() {
+      const body = document.getElementById("inventarioTableBody");
+      if (state.inventario.length === 0) {
+        body.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-500">No hay movimientos de inventario registrados.</td></tr>`;
+        return;
+      }
+      
+      body.innerHTML = state.inventario.map(i => {
+        const cant = parseFloat(i.cantidad_kg) || 0;
+        const color = cant > 0 ? "text-emerald-500" : "text-rose-500 font-semibold";
+        const alertaColor = i.alerta_proveedor && i.alerta_proveedor.startsWith("SÍ") ? "bg-rose-500/10 text-rose-400 border border-rose-500/20" : "bg-slate-900 text-slate-500";
+        
+        return `
+          <tr>
+            <td class="p-4 text-slate-400">${i.fecha_movimiento}</td>
+            <td class="p-4 font-semibold text-white">${i.ingrediente}</td>
+            <td class="p-4 text-slate-300">${i.tipo_movimiento}</td>
+            <td class="p-4 text-center ${color}">${cant > 0 ? '+' : ''}${cant.toFixed(2)} kg</td>
+            <td class="p-4 text-center text-slate-300">${i.costo_por_kg_usd ? '$' + parseFloat(i.costo_por_kg_usd).toFixed(2) : '-'}</td>
+            <td class="p-4 text-center text-slate-300">${parseFloat(i.peso_real_verificado_kg) > 0 ? parseFloat(i.peso_real_verificado_kg).toFixed(2) + ' kg' : '-'}</td>
+            <td class="p-4 text-center text-rose-400 font-semibold">${parseFloat(i.diferencia_kg) > 0 ? parseFloat(i.diferencia_kg).toFixed(2) + ' kg' : '-'}</td>
+            <td class="p-4 text-center">
+              <span class="px-2 py-0.5 rounded text-[10px] ${alertaColor}">${i.alerta_proveedor || 'No'}</span>
+            </td>
+          </tr>
+        `;
+      }).reverse().join("");
+    }
+
+    function renderCostos() {
+      const container = document.getElementById("recetasContainer");
+      if (state.recetas.length === 0) {
+        container.innerHTML = `<div class="col-span-2 text-center text-slate-500 py-10">No hay recetas registradas.</div>`;
+        return;
+      }
+      
+      // Agrupar recetas por producto
+      const recetasPorProducto = {};
+      state.recetas.forEach(r => {
+        if (!recetasPorProducto[r.producto_id]) {
+          recetasPorProducto[r.producto_id] = [];
+        }
+        recetasPorProducto[r.producto_id].push(r);
+      });
+      
+      container.innerHTML = Object.keys(recetasPorProducto).map(prodId => {
+        const prod = state.productos.find(p => p.id === prodId) || { nombre: "Producto Desconocido", costo_usd: 0 };
+        const ingredients = recetasPorProducto[prodId];
+        
+        return `
+          <div class="bg-slate-900/60 p-6 rounded-2xl border border-slate-800 space-y-4 shadow-xl">
+            <div class="flex justify-between items-start border-b border-slate-800 pb-3">
+              <div>
+                <h4 class="font-bold text-white text-md">${prod.nombre}</h4>
+                <span class="text-[10px] text-slate-400 uppercase">Fórmula de Panadero</span>
+              </div>
+              <div class="text-right">
+                <span class="text-xs text-slate-400 block">Costo Directo Est:</span>
+                <span class="font-bold text-amber-500">$${parseFloat(prod.costo_usd || 0).toFixed(2)}</span>
+              </div>
+            </div>
+            
+            <div class="space-y-1.5 text-xs">
+              <div class="flex justify-between text-slate-500 border-b border-slate-800 pb-1 font-semibold">
+                <span>Ingrediente</span>
+                <span>Porcentaje Panadero</span>
+              </div>
+              ${ingredients.map(ing => `
+                <div class="flex justify-between text-slate-300">
+                  <span>${ing.ingrediente}</span>
+                  <span class="font-mono font-semibold">${ing.porcentaje_panadero}%</span>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderCatalogo() {
+      const body = document.getElementById("catalogoTableBody");
+      if (state.productos.length === 0) {
+        body.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-500">No hay productos en el catálogo.</td></tr>`;
+        return;
+      }
+      
+      body.innerHTML = state.productos.map(p => {
+        const costo = parseFloat(p.costo_usd) || 0;
+        const precio = parseFloat(p.precio_venta_usd) || 0;
+        const stock = parseFloat(p.stock_disponible) || 0;
+        
+        let statusBadge = "bg-rose-500/10 text-rose-400 border border-rose-500/20";
+        let statusText = "Agotado";
+        if (stock > 0) {
+          statusBadge = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+          statusText = "Disponible";
+        }
+        
+        return `
+          <tr>
+            <td class="p-4 font-semibold text-white">${p.nombre}</td>
+            <td class="p-4 text-slate-400">${p.unidad_empaque}</td>
+            <td class="p-4 text-center text-slate-300">$${costo.toFixed(2)}</td>
+            <td class="p-4 text-center font-bold text-white">$${precio.toFixed(2)}</td>
+            <td class="p-4 text-center text-amber-500">Bs. ${(precio * state.tasaBcb).toFixed(2)}</td>
+            <td class="p-4 text-center font-semibold text-slate-200">${stock} paquetes</td>
+            <td class="p-4 text-center">
+              <span class="px-2 py-0.5 rounded text-[10px] ${statusBadge}">${statusText}</span>
+            </td>
+            <td class="p-4 text-right">
+              <button onclick="abrirEdicionPrecio('${p.id}', '${p.nombre}', ${precio}, ${stock})" class="text-amber-500 hover:text-amber-400 font-semibold">Ajustar Precio</button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function renderCestas() {
+      const deudoresBody = document.getElementById("cestasDeudoresBody");
+      const historialDiv = document.getElementById("cestasHistorial");
+      
+      // 1. Mostrar deudores
+      const deudores = state.clientes.filter(c => parseInt(c.cestas_deudas) > 0);
+      if (deudores.length === 0) {
+        deudoresBody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-500">No hay deudas de cestas registradas.</td></tr>`;
+      } else {
+        deudoresBody.innerHTML = deudores.map(d => {
+          const deudas = parseInt(d.cestas_deudas);
+          const alertClass = deudas >= 50 ? "text-rose-500 font-bold" : "text-amber-500 font-semibold";
+          
+          return `
+            <tr>
+              <td class="py-3 font-semibold text-white">${d.nombre}</td>
+              <td class="py-3 text-center ${alertClass}">${deudas} unidades</td>
+              <td class="py-3 text-center">
+                <span class="px-2 py-0.5 rounded text-[10px] ${deudas >= 50 ? 'bg-rose-500/10 text-rose-400' : 'bg-amber-500/10 text-amber-400'}">${deudas >= 50 ? 'Crítico (Alerta)' : 'Estable'}</span>
+              </td>
+            </tr>
+          `;
+        }).join("");
+      }
+
+      // 2. Historial de salidas / retornos
+      if (state.cestas.length === 0) {
+        historialDiv.innerHTML = `<div class="text-center text-slate-500 py-6">No hay registros de movimientos de cestas.</div>`;
+      } else {
+        historialDiv.innerHTML = state.cestas.map(c => {
+          const isSalida = c.tipo_movimiento === "Salida";
+          const bg = isSalida ? "bg-rose-500/5 border-rose-500/20 text-rose-200" : "bg-emerald-500/5 border-emerald-500/20 text-emerald-200";
+          const client = state.clientes.find(cl => cl.id === c.cliente_id) || { nombre: "Cliente Particular" };
+          
+          return `
+            <div class="p-3 border rounded-xl ${bg}">
+              <div class="flex justify-between font-semibold">
+                <span>${isSalida ? '📤 SALIDA' : '📥 RETORNO'}</span>
+                <span>${c.cantidad} Cestas</span>
+              </div>
+              <div class="mt-1 text-slate-400 text-[10px] flex justify-between">
+                <span>Cliente: ${client.nombre}</span>
+                <span>${c.fecha}</span>
+              </div>
+              <div class="text-[10px] text-slate-500 mt-0.5">Ruta: ${c.chofer}</div>
+            </div>
+          `;
+        }).reverse().join("");
+      }
+    }
+
+    function populateDropdowns() {
+      // Clientes dropdowns
+      const clienteSelects = ["venta-cliente", "cesta-cliente"];
+      clienteSelects.forEach(selectId => {
+        const el = document.getElementById(selectId);
+        if (el) {
+          el.innerHTML = state.clientes.map(c => `<option value="${c.id}">${c.nombre}</option>`).join("");
+        }
+      });
+
+      // Productos dropdowns
+      const prodSelects = ["orden-producto", "sim-producto"];
+      prodSelects.forEach(selectId => {
+        const el = document.getElementById(selectId);
+        if (el) {
+          el.innerHTML = state.productos.map(p => `<option value="${p.id}">${p.nombre}</option>`).join("");
+        }
+      });
+      
+      // Productos Checklist en Venta
+      const grid = document.getElementById("ventaProductosGrid");
+      if (grid) {
+        grid.innerHTML = state.productos.map(p => `
+          <div class="flex items-center justify-between border-b border-slate-900 pb-1.5">
+            <label class="flex items-center gap-2 text-white">
+              <input type="checkbox" name="venta-prod-check" value="${p.id}" class="rounded text-amber-500 focus:ring-0 bg-slate-950 border-slate-800">
+              <span>${p.nombre} ($${parseFloat(p.precio_venta_usd).toFixed(2)})</span>
+            </label>
+            <input type="number" id="venta-prod-qty-${p.id}" placeholder="Cant" min="1" class="w-16 bg-slate-950 border border-slate-800 rounded p-1 text-xs text-white text-center focus:outline-none focus:border-amber-500">
+          </div>
+        `).join("");
+      }
+      
+      // Tasa en venta
+      const tasaPrev = document.getElementById("venta-tasa-preview");
+      if (tasaPrev) tasaPrev.value = "Bs. " + state.tasaBcb.toFixed(4);
+    }
+
+    // Aprobación de Egresos
+    function approveEgreso(id) {
+      if (typeof google === "undefined") {
+        const eg = state.egresos.find(e => e.id === id);
+        if (eg) eg.estado_aprobacion = "Aprobado";
+        renderAll();
+        return;
+      }
+      google.script.run.withSuccessHandler(() => {
+        refreshAllData();
+      }).apiAprobarEgreso(id);
+    }
+
+    function rejectEgreso(id) {
+      if (typeof google === "undefined") {
+        const eg = state.egresos.find(e => e.id === id);
+        if (eg) eg.estado_aprobacion = "Rechazado";
+        renderAll();
+        return;
+      }
+      google.script.run.withSuccessHandler(() => {
+        refreshAllData();
+      }).apiRechazarEgreso(id);
+    }
+
+    // Exportar egresos a Fina
+    function exportToFina() {
+      if (typeof google === "undefined") {
+        alert("Simulación de exportación contable: OK!");
+        return;
+      }
+      google.script.run.withSuccessHandler((msg) => {
+        alert(msg);
+      }).apiExportEgresosToFina();
+    }
+
+    // Guardar Egreso Form
+    function handleEgresoSubmit(e) {
+      e.preventDefault();
+      
+      const fileInput = document.getElementById("egreso-foto");
+      const egresoData = {
+        proveedor: document.getElementById("egreso-proveedor").value,
+        categoria: document.getElementById("egreso-categoria").value,
+        cuenta_origen: document.getElementById("egreso-cuenta").value,
+        monto_usd: document.getElementById("egreso-monto-usd").value,
+        monto_ves: document.getElementById("egreso-monto-ves").value,
+        descripcion: document.getElementById("egreso-descripcion").value
+      };
+      
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const base64Data = evt.target.result;
+          if (typeof google !== "undefined") {
+            google.script.run.withSuccessHandler(() => {
+              closeModal("modal-egreso");
+              document.getElementById("egresoForm").reset();
+              refreshAllData();
+            }).apiRegistrarEgreso(egresoData, base64Data, file.type);
+          } else {
+            egresoData.id = Date.now().toString();
+            egresoData.fecha = new Date().toISOString().substring(0, 10);
+            egresoData.foto_soporte_url = "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=400";
+            egresoData.estado_aprobacion = parseFloat(egresoData.monto_usd) > 100 ? "Pendiente" : "Aprobado";
+            state.egresos.push(egresoData);
+            closeModal("modal-egreso");
+            document.getElementById("egresoForm").reset();
+            renderAll();
+          }
+        };
+        reader.readAsDataURL(file);
+      } else {
+        if (typeof google !== "undefined") {
+          google.script.run.withSuccessHandler(() => {
+            closeModal("modal-egreso");
+            document.getElementById("egresoForm").reset();
+            refreshAllData();
+          }).apiRegistrarEgreso(egresoData, null, null);
+        } else {
+          egresoData.id = Date.now().toString();
+          egresoData.fecha = new Date().toISOString().substring(0, 10);
+          egresoData.foto_soporte_url = "";
+          egresoData.estado_aprobacion = parseFloat(egresoData.monto_usd) > 100 ? "Pendiente" : "Aprobado";
+          state.egresos.push(egresoData);
+          closeModal("modal-egreso");
+          document.getElementById("egresoForm").reset();
+          renderAll();
+        }
+      }
+    }
+
+    // Submit de Ventas
+    function handleVentaSubmit(e) {
+      e.preventDefault();
+      
+      const checklist = document.querySelectorAll('input[name="venta-prod-check"]:checked');
+      const items = [];
+      
+      checklist.forEach(chk => {
+        const id = chk.value;
+        const qty = parseInt(document.getElementById("venta-prod-qty-" + id).value) || 0;
+        const prod = state.productos.find(p => p.id === id);
+        if (qty > 0 && prod) {
+          items.push({
+            id: prod.id,
+            nombre: prod.nombre,
+            cantidad: qty,
+            precio_unitario: parseFloat(prod.precio_venta_usd)
+          });
+        }
+      });
+      
+      if (items.length === 0) {
+        alert("Por favor selecciona al menos un producto con cantidad válida.");
+        return;
+      }
+      
+      const ventaData = {
+        cliente_id: document.getElementById("venta-cliente").value,
+        productos: items
+      };
+      
+      if (typeof google !== "undefined") {
+        google.script.run.withSuccessHandler(() => {
+          closeModal("modal-venta");
+          document.getElementById("ventaForm").reset();
+          refreshAllData();
+        }).apiRegistrarVenta(ventaData);
+      } else {
+        ventaData.id = Date.now().toString();
+        ventaData.fecha = new Date().toISOString().substring(0, 10);
+        ventaData.tasa_oficial = state.tasaBcb;
+        ventaData.monto_usd = items.reduce((acc, i) => acc + (i.cantidad * i.precio_unitario), 0).toFixed(2);
+        ventaData.monto_ves = (parseFloat(ventaData.monto_usd) * state.tasaBcb).toFixed(2);
+        ventaData.estado_cobro = "Pendiente";
+        ventaData.pdf_url = "https://example.com/mock-invoice.pdf";
+        state.ventas.push(ventaData);
+        closeModal("modal-venta");
+        document.getElementById("ventaForm").reset();
+        renderAll();
+      }
+    }
+
+    // Abonos y cruces
+    function openCruceModal(ventaId, clienteNombre, pendienteUsd) {
+      document.getElementById("cruce-venta-id").value = ventaId;
+      document.getElementById("cruce-factura-detalle").innerText = `Cliente: ${clienteNombre} | Saldo Pendiente: $${pendienteUsd.toFixed(2)} USD`;
+      document.getElementById("cruce-monto-usd").value = pendienteUsd.toFixed(2);
+      openModal("modal-cruce");
+    }
+
+    function handleCruceSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById("cruce-venta-id").value;
+      const monto = parseFloat(document.getElementById("cruce-monto-usd").value);
+      
+      if (typeof google !== "undefined") {
+        google.script.run.withSuccessHandler(() => {
+          closeModal("modal-cruce");
+          refreshAllData();
+        }).apiRegistrarPagoVenta(id, monto);
+      } else {
+        const v = state.ventas.find(ve => ve.id === id);
+        if (v) {
+          const actual = parseFloat(v.monto_abonado || 0);
+          v.monto_abonado = (actual + monto).toFixed(2);
+          if (actual + monto >= parseFloat(v.monto_usd) - 0.05) {
+            v.estado_cobro = "Cobrado";
+          } else {
+            v.estado_cobro = "Abonado Parcial";
+          }
+        }
+        closeModal("modal-cruce");
+        renderAll();
+      }
+    }
+
+    // Producción Preview
+    function actualizarCalculoProduccionPreview() {
+      const prodId = document.getElementById("orden-producto").value;
+      const paquetes = parseInt(document.getElementById("orden-paquetes").value) || 0;
+      
+      if (paquetes <= 0) {
+        document.getElementById("ordenCalculoPreview").classList.add("hidden");
+        return;
+      }
+      
+      const prod = state.productos.find(p => p.id === prodId);
+      const formula = state.recetas.filter(r => r.producto_id === prodId);
+      
+      if (formula.length === 0 || !prod) return;
+      
+      // Algoritmo local de porcentaje de panadero para el preview
+      const unidades = paquetes * parseInt(prod.unidad_empaque || 12);
+      const peso = parseFloat(prod.peso_por_unidad_g || 80);
+      let totalG = unidades * peso * 1.02; // +2% merma
+      
+      let sumaOtros = 0;
+      formula.forEach(f => {
+        if (f.ingrediente.toLowerCase() !== "harina" && f.ingrediente.toLowerCase() !== "harina de trigo" && f.ingrediente.toLowerCase() !== "harina base") {
+          sumaOtros += parseFloat(f.porcentaje_panadero) / 100;
+        }
+      });
+      
+      const pesoHarina = totalG / (1 + sumaOtros);
+      
+      document.getElementById("preview-masa-total").innerText = (totalG / 1000).toFixed(2) + " kg";
+      
+      const listHtml = formula.map(f => {
+        const ingNom = f.ingrediente.toLowerCase();
+        const gramos = (ingNom === "harina" || ingNom === "harina de trigo" || ingNom === "harina base") ? pesoHarina : pesoHarina * (parseFloat(f.porcentaje_panadero) / 100);
+        return `
+          <div class="flex justify-between text-slate-400">
+            <span>${f.ingrediente} (${f.porcentaje_panadero}%)</span>
+            <span class="font-mono">${Math.round(gramos)} g</span>
+          </div>
+        `;
+      }).join("");
+      
+      document.getElementById("preview-ingredientes-list").innerHTML = listHtml;
+      document.getElementById("ordenCalculoPreview").classList.remove("hidden");
+    }
+
+    function handleOrdenSubmit(e) {
+      e.preventDefault();
+      const ordenData = {
+        producto_id: document.getElementById("orden-producto").value,
+        paquetes_requeridos: parseInt(document.getElementById("orden-paquetes").value)
+      };
+      
+      if (typeof google !== "undefined") {
+        google.script.run.withSuccessHandler(() => {
+          closeModal("modal-orden");
+          document.getElementById("ordenForm").reset();
+          refreshAllData();
+        }).apiCrearOrdenProduccion(ordenData);
+      } else {
+        const calculo = {
+          producto: state.productos.find(p => p.id === ordenData.producto_id).nombre,
+          paquetes: ordenData.paquetes_requeridos,
+          masaTotalKg: parseFloat(document.getElementById("preview-masa-total").innerText).toFixed(2),
+          desglose: []
+        };
+        
+        ordenData.id = Date.now().toString();
+        ordenData.fecha = new Date().toISOString().substring(0, 10);
+        ordenData.masa_total_kg = calculo.masaTotalKg;
+        ordenData.estado = "Pendiente";
+        ordenData.ingredientes_gramos = "[]";
+        state.ordenes.push(ordenData);
+        closeModal("modal-orden");
+        document.getElementById("ordenForm").reset();
+        renderAll();
+      }
+    }
+
+    function updateOrderStatus(id, status) {
+      if (typeof google === "undefined") {
+        const o = state.ordenes.find(ord => ord.id === id);
+        if (o) o.estado = status;
+        renderAll();
+        return;
+      }
+      google.script.run.withSuccessHandler(() => {
+        refreshAllData();
+      }).apiActualizarEstadoOrden(id, status);
+    }
+
+    // Entrada Materia Prima
+    function handleEntradaMateriaSubmit(e) {
+      e.preventDefault();
+      const data = {
+        ingrediente: document.getElementById("entrada-ingrediente").value,
+        peso_nominal: parseFloat(document.getElementById("entrada-peso-nominal").value),
+        peso_real: parseFloat(document.getElementById("entrada-peso-real").value),
+        costo_por_kg_usd: parseFloat(document.getElementById("entrada-costo").value)
+      };
+      
+      if (typeof google !== "undefined") {
+        google.script.run.withSuccessHandler(() => {
+          closeModal("modal-entrada-materia");
+          document.getElementById("entradaMateriaForm").reset();
+          refreshAllData();
+        }).apiRegistrarEntradaInventario(data);
+      } else {
+        const diff = data.peso_nominal - data.peso_real;
+        state.inventario.push({
+          fecha_movimiento: new Date().toISOString().substring(0, 10),
+          ingrediente: data.ingrediente,
+          tipo_movimiento: "Entrada",
+          cantidad_kg: data.peso_real,
+          costo_por_kg_usd: data.costo_por_kg_usd,
+          peso_real_verificado_kg: data.peso_real,
+          diferencia_kg: diff,
+          alerta_proveedor: diff > (data.peso_nominal * 0.01) ? "SÍ" : "No"
+        });
+        closeModal("modal-entrada-materia");
+        document.getElementById("entradaMateriaForm").reset();
+        renderAll();
+      }
+    }
+
+    // Harina Mesa
+    function handleHarinaMesaSubmit(e) {
+      e.preventDefault();
+      const qty = parseFloat(document.getElementById("mesa-cantidad").value);
+      const desc = document.getElementById("mesa-descripcion").value;
+      
+      if (typeof google !== "undefined") {
+        google.script.run.withSuccessHandler(() => {
+          closeModal("modal-harina-mesa");
+          document.getElementById("harinaMesaForm").reset();
+          refreshAllData();
+        }).apiRegistrarAsignacionHarinaMesa(qty, desc);
+      } else {
+        state.inventario.push({
+          fecha_movimiento: new Date().toISOString().substring(0, 10),
+          ingrediente: "Harina de Mesa / Espolvorear",
+          tipo_movimiento: "Consumo Indirecto",
+          cantidad_kg: -Math.abs(qty),
+          costo_por_kg_usd: 1.25,
+          peso_real_verificado_kg: 0,
+          diferencia_kg: 0,
+          alerta_proveedor: "No"
+        });
+        closeModal("modal-harina-mesa");
+        document.getElementById("harinaMesaForm").reset();
+        renderAll();
+      }
+    }
+
+    // Cestas
+    function handleCestaSubmit(e) {
+      e.preventDefault();
+      const data = {
+        tipo_movimiento: document.getElementById("cesta-tipo").value,
+        chofer: document.getElementById("cesta-chofer").value,
+        cliente_id: document.getElementById("cesta-cliente").value,
+        cantidad: parseInt(document.getElementById("cesta-cantidad").value)
+      };
+      
+      if (typeof google !== "undefined") {
+        google.script.run.withSuccessHandler(() => {
+          closeModal("modal-cesta");
+          document.getElementById("cestaForm").reset();
+          refreshAllData();
+        }).apiRegistrarMovimientoCestas(data);
+      } else {
+        data.fecha = new Date().toISOString().substring(0, 10);
+        state.cestas.push(data);
+        const cli = state.clientes.find(c => c.id === data.cliente_id);
+        if (cli) {
+          const actual = parseInt(cli.cestas_deudas || 0);
+          cli.cestas_deudas = data.tipo_movimiento === "Salida" ? actual + data.cantidad : actual - data.cantidad;
+        }
+        closeModal("modal-cesta");
+        document.getElementById("cestaForm").reset();
+        renderAll();
+      }
+    }
+
+    // Costos
+    function recalcularCostosBackend() {
+      if (typeof google === "undefined") {
+        alert("Costos recalculados (Simulado)");
+        return;
+      }
+      google.script.run.withSuccessHandler((msg) => {
+        alert(msg);
+        refreshAllData();
+      }).apiRecalcularTodosLosCostos();
+    }
+
+    // Simulador
+    function abrirSimuladorPrecio() {
+      openModal("modal-simulador");
+    }
+
+    function handleSimulacion(e) {
+      e.preventDefault();
+      const prodId = document.getElementById("sim-producto").value;
+      const margin = parseFloat(document.getElementById("sim-margen").value);
+      
+      if (typeof google !== "undefined") {
+        google.script.run.withSuccessHandler((res) => {
+          document.getElementById("sim-costo-val").innerText = "$" + parseFloat(res.costoUsd).toFixed(2);
+          document.getElementById("sim-sug-usd").innerText = "$" + parseFloat(res.precioVentaSugeridoUSD).toFixed(2);
+          document.getElementById("sim-sug-ves").innerText = "Bs. " + parseFloat(res.precioVentaSugeridoVES).toLocaleString();
+          document.getElementById("simuladorResult").classList.remove("hidden");
+        }).apiSimularPrecioVenta(prodId, margin);
+      } else {
+        const prod = state.productos.find(p => p.id === prodId);
+        if (prod) {
+          const costo = parseFloat(prod.costo_usd) || 1.1;
+          const sugUsd = costo / (1 - (margin / 100));
+          document.getElementById("sim-costo-val").innerText = "$" + costo.toFixed(2);
+          document.getElementById("sim-sug-usd").innerText = "$" + sugUsd.toFixed(2);
+          document.getElementById("sim-sug-ves").innerText = "Bs. " + (sugUsd * state.tasaBcb).toLocaleString();
+          document.getElementById("simuladorResult").classList.remove("hidden");
+        }
+      }
+    }
+
+    // Ajustar precios
+    let editingProdId = null;
+    function abrirEdicionPrecio(id, nombre, precio, stock) {
+      editingProdId = id;
+      const nuevoPrecio = prompt(`Ajustar Precio de Venta para ${nombre}:`, precio);
+      const nuevoStock = prompt(`Ajustar Stock Disponible (paquetes):`, stock);
+      
+      if (nuevoPrecio !== null && nuevoStock !== null) {
+        if (typeof google !== "undefined") {
+          google.script.run.withSuccessHandler(() => {
+            refreshAllData();
+          }).apiActualizarPrecioYStock(editingProdId, parseFloat(nuevoPrecio), parseFloat(nuevoStock));
+        } else {
+          const prod = state.productos.find(p => p.id === id);
+          if (prod) {
+            prod.precio_venta_usd = parseFloat(nuevoPrecio).toFixed(2);
+            prod.stock_disponible = parseFloat(nuevoStock);
+          }
+          renderAll();
+        }
+      }
+    }
+
+    // MOCK DATA PARA PRUEBA LOCAL (FUERA DE APPS SCRIPT)
+    function loadMockData() {
+      state.tasaBcb = 36.5432;
+      document.getElementById("sidebar-tasa").innerText = "Bs. 36.5432";
+      
+      state.clientes = [
+        { id: "c1", nombre: "Disprocar Mayorista", telefono: "0414-1111111", direccion: "Porlamar", cestas_deudas: 120 },
+        { id: "c2", nombre: "Mercanoma S.A.", telefono: "0412-2222222", direccion: "Juan Griego", cestas_deudas: 25 },
+        { id: "c3", nombre: "Urbe Market", telefono: "0424-3333333", direccion: "Pampatar", cestas_deudas: 4 }
+      ];
+
+      state.productos = [
+        { id: "p1", nombre: "Pan Hamburguesa Junior", unidad_empaque: "12 unidades", peso_por_unidad_g: 77.78, costo_usd: "0.85", precio_venta_usd: "1.50", stock_disponible: 150 },
+        { id: "p2", nombre: "Pan Perro Caliente Granjero", unidad_empaque: "12 unidades", peso_por_unidad_g: 80.00, costo_usd: "0.90", precio_venta_usd: "1.60", stock_disponible: 80 },
+        { id: "p3", nombre: "Galleta de Huevo Tradicional", unidad_empaque: "6 unidades", peso_por_unidad_g: 100.00, costo_usd: "0.60", precio_venta_usd: "1.20", stock_disponible: 0 }
+      ];
+
+      state.recetas = [
+        { id: "r1", producto_id: "p1", ingrediente: "Harina de Trigo", porcentaje_panadero: "100.0" },
+        { id: "r2", producto_id: "p1", ingrediente: "Azúcar", porcentaje_panadero: "15.0" },
+        { id: "r3", producto_id: "p1", ingrediente: "Manteca", porcentaje_panadero: "6.0" },
+        { id: "r4", producto_id: "p1", ingrediente: "Sal", porcentaje_panadero: "2.0" },
+        { id: "r5", producto_id: "p1", ingrediente: "Levadura", porcentaje_panadero: "2.5" },
+        { id: "r6", producto_id: "p2", ingrediente: "Harina de Trigo", porcentaje_panadero: "100.0" },
+        { id: "r7", producto_id: "p2", ingrediente: "Azúcar", porcentaje_panadero: "12.0" },
+        { id: "r8", producto_id: "p2", ingrediente: "Manteca", porcentaje_panadero: "8.0" }
+      ];
+
+      state.egresos = [
+        { id: "e1", fecha: "2026-08-01", proveedor: "Molinos del Caribe", categoria: "Materia Prima", monto_usd: "350.00", monto_ves: "12790.12", cuenta_origen: "Banesco Cuenta Jurídica", descripcion: "Compra 10 sacos harina de trigo", foto_soporte_url: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=400", estado_aprobacion: "Aprobado" },
+        { id: "e2", fecha: "2026-08-03", proveedor: "Ferretería El Tornillo", categoria: "Mantenimiento/Infraestructura", monto_usd: "120.00", monto_ves: "4385.18", cuenta_origen: "Caja Chica Efectivo", descripcion: "Repuestos rolinera sobadora", foto_soporte_url: "", estado_aprobacion: "Pendiente" }
+      ];
+
+      state.ventas = [
+        { id: "v1", fecha: "2026-08-02", cliente_id: "c1", monto_usd: "180.00", monto_abonado: "100.00", tasa_oficial: 36.5432, estado_cobro: "Abonado Parcial", pdf_url: "https://example.com/mock-invoice.pdf" },
+        { id: "v2", fecha: "2026-08-04", cliente_id: "c2", monto_usd: "45.00", monto_abonado: "45.00", tasa_oficial: 36.5432, estado_cobro: "Cobrado", pdf_url: "https://example.com/mock-invoice.pdf" }
+      ];
+
+      state.ordenesproduction = [
+        { id: "o1", fecha: "2026-08-03", producto_id: "p1", paquetes_requeridos: 50, masa_total_kg: "47.60", estado: "Completado", ingredientes_gramos: "[]" }
+      ];
+
+      state.inventario = [
+        { id: "i1", fecha_movimiento: "2026-08-01", ingrediente: "Harina de Trigo", tipo_movimiento: "Entrada", cantidad_kg: 44.5, costo_por_kg_usd: 1.10, peso_real_verificado_kg: 44.5, diferencia_kg: 0.5, alerta_proveedor: "No" },
+        { id: "i2", fecha_movimiento: "2026-08-03", ingrediente: "Harina de Mesa / Espolvorear", tipo_movimiento: "Consumo Indirecto", cantidad_kg: -4.0, costo_por_kg_usd: 1.10, peso_real_verificado_kg: 0, diferencia_kg: 0, alerta_proveedor: "No" }
+      ];
+
+      state.cestas = [
+        { id: "cs1", fecha: "2026-08-02", tipo_movimiento: "Salida", chofer: "Sr. Gallardo", cliente_id: "c1", cantidad: 40 },
+        { id: "cs2", fecha: "2026-08-04", tipo_movimiento: "Retorno", chofer: "Jorge", cliente_id: "c1", cantidad: 15 }
+      ];
+
+      state.kpis = {
+        ventasHoyUSD: "180.00",
+        egresosMesUSD: "350.00",
+        pendientesCobroUSD: "80.00",
+        cestasCalle: 149
+      };
+    }
+  </script>
+</body>
+</html>
