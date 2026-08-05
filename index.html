@@ -791,7 +791,7 @@
       productos: [],
       clientes: [],
       recetas: [],
-      ordenes: [],
+      ordenesproduccion: [],
       inventario: [],
       cestas: [],
       kpis: {}
@@ -1094,12 +1094,12 @@
 
     function renderProduccion() {
       const body = document.getElementById("ordenesTableBody");
-      if (state.ordenesproduction.length === 0) {
+      if (state.ordenesproduccion.length === 0) {
         body.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-500">No hay órdenes de producción registradas.</td></tr>`;
         return;
       }
       
-      body.innerHTML = state.ordenesproduction.map(o => {
+      body.innerHTML = state.ordenesproduccion.map(o => {
         let badgeColor = "bg-amber-500/10 text-amber-400 border border-amber-500/20";
         if (o.estado === "Completado") badgeColor = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
         else if (o.estado === "En Planta") badgeColor = "bg-blue-500/10 text-blue-400 border border-blue-500/20";
@@ -1589,7 +1589,7 @@
         ordenData.masa_total_kg = calculo.masaTotalKg;
         ordenData.estado = "Pendiente";
         ordenData.ingredientes_gramos = "[]";
-        state.ordenes.push(ordenData);
+        state.ordenesproduccion.push(ordenData);
         closeModal("modal-orden");
         document.getElementById("ordenForm").reset();
         renderAll();
@@ -1598,7 +1598,7 @@
 
     function updateOrderStatus(id, status) {
       if (typeof google === "undefined") {
-        const o = state.ordenes.find(ord => ord.id === id);
+        const o = state.ordenesproduccion.find(ord => ord.id === id);
         if (o) o.estado = status;
         renderAll();
         return;
@@ -1804,7 +1804,7 @@
         { id: "v2", fecha: "2026-08-04", cliente_id: "c2", monto_usd: "45.00", monto_abonado: "45.00", tasa_oficial: 36.5432, estado_cobro: "Cobrado", pdf_url: "https://example.com/mock-invoice.pdf" }
       ];
 
-      state.ordenesproduction = [
+      state.ordenesproduccion = [
         { id: "o1", fecha: "2026-08-03", producto_id: "p1", paquetes_requeridos: 50, masa_total_kg: "47.60", estado: "Completado", ingredientes_gramos: "[]" }
       ];
 
