@@ -8,8 +8,9 @@
  * Sirve el frontend (index.html) al acceder al enlace web del script.
  */
 function doGet(e) {
+  const page = (e && e.parameter && e.parameter.page) || "index";
   // Configurar metadatos y políticas de seguridad
-  const htmlOutput = HtmlService.createTemplateFromFile("index")
+  const htmlOutput = HtmlService.createTemplateFromFile(page)
     .evaluate()
     .setTitle("Portal Administrativo - Degusta y Disfruta C.A.")
     .setSandboxMode(HtmlService.SandboxMode.IFRAME)
