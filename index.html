@@ -1560,7 +1560,7 @@
           } else {
             egresoData.id = Date.now().toString();
             egresoData.fecha = new Date().toISOString().substring(0, 10);
-            egresoData.foto_soporte_url = "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=400";
+            egresoData.foto_soporte_url = "https:\/\/images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=400";
             egresoData.estado_aprobacion = parseFloat(egresoData.monto_usd) > 100 ? "Pendiente" : "Aprobado";
             state.egresos.push(egresoData);
             closeModal("modal-egreso");
@@ -1633,7 +1633,7 @@
         ventaData.monto_usd = items.reduce((acc, i) => acc + (i.cantidad * i.precio_unitario), 0).toFixed(2);
         ventaData.monto_ves = (parseFloat(ventaData.monto_usd) * state.tasaBcb).toFixed(2);
         ventaData.estado_cobro = "Pendiente";
-        ventaData.pdf_url = "https://example.com/mock-invoice.pdf";
+        ventaData.pdf_url = "https:\/\/example.com/mock-invoice.pdf";
         state.ventas.push(ventaData);
         closeModal("modal-venta");
         document.getElementById("ventaForm").reset();
@@ -1953,13 +1953,13 @@
       ];
 
       state.egresos = [
-        { id: "e1", fecha: "2026-08-01", proveedor: "Molinos del Caribe", categoria: "Materia Prima", monto_usd: "350.00", monto_ves: "12790.12", cuenta_origen: "Banesco Cuenta Jurídica", descripcion: "Compra 10 sacos harina de trigo", foto_soporte_url: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=400", estado_aprobacion: "Aprobado" },
+        { id: "e1", fecha: "2026-08-01", proveedor: "Molinos del Caribe", categoria: "Materia Prima", monto_usd: "350.00", monto_ves: "12790.12", cuenta_origen: "Banesco Cuenta Jurídica", descripcion: "Compra 10 sacos harina de trigo", foto_soporte_url: "https:\/\/images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=400", estado_aprobacion: "Aprobado" },
         { id: "e2", fecha: "2026-08-03", proveedor: "Ferretería El Tornillo", categoria: "Mantenimiento/Infraestructura", monto_usd: "120.00", monto_ves: "4385.18", cuenta_origen: "Caja Chica Efectivo", descripcion: "Repuestos rolinera sobadora", foto_soporte_url: "", estado_aprobacion: "Pendiente" }
       ];
 
       state.ventas = [
-        { id: "v1", fecha: "2026-08-02", cliente_id: "c1", monto_usd: "180.00", monto_abonado: "100.00", tasa_oficial: 36.5432, estado_cobro: "Abonado Parcial", pdf_url: "https://example.com/mock-invoice.pdf" },
-        { id: "v2", fecha: "2026-08-04", cliente_id: "c2", monto_usd: "45.00", monto_abonado: "45.00", tasa_oficial: 36.5432, estado_cobro: "Cobrado", pdf_url: "https://example.com/mock-invoice.pdf" }
+        { id: "v1", fecha: "2026-08-02", cliente_id: "c1", monto_usd: "180.00", monto_abonado: "100.00", tasa_oficial: 36.5432, estado_cobro: "Abonado Parcial", pdf_url: "https:\/\/example.com/mock-invoice.pdf" },
+        { id: "v2", fecha: "2026-08-04", cliente_id: "c2", monto_usd: "45.00", monto_abonado: "45.00", tasa_oficial: 36.5432, estado_cobro: "Cobrado", pdf_url: "https:\/\/example.com/mock-invoice.pdf" }
       ];
 
       state.ordenesproduccion = [
