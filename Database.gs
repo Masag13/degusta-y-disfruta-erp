@@ -5,8 +5,8 @@
  * Proporciona inicialización automática y operaciones CRUD genéricas.
  */
 
-// Nombre del archivo de base de datos
-const DB_NAME = "Ecosistema Degusta y Disfruta - DB";
+// ID de la hoja de cálculo de base de datos vinculada
+const SPREADSHEET_ID = "17FuHU3wKdHqf3folN17O0yHlulv2HKt7qGd5jkSyR50";
 
 // Estructura de las tablas y sus encabezados
 const SCHEMAS = {
@@ -21,22 +21,10 @@ const SCHEMAS = {
 };
 
 /**
- * Obtiene la hoja de cálculo activa vinculada al script, o crea una nueva si no existe.
+ * Obtiene la hoja de cálculo vinculada mediante su ID explícito.
  */
 function getSpreadsheet() {
-  try {
-    // Si el script está vinculado a una hoja de cálculo
-    return SpreadsheetApp.getActiveSpreadsheet();
-  } catch (e) {
-    // Si es un script independiente, buscar por nombre o crear uno
-    const files = DriveApp.getFilesByName(DB_NAME);
-    if (files.hasNext()) {
-      return SpreadsheetApp.open(files.next());
-    } else {
-      const ss = SpreadsheetApp.create(DB_NAME);
-      return ss;
-    }
-  }
+  return SpreadsheetApp.openById(SPREADSHEET_ID);
 }
 
 /**
