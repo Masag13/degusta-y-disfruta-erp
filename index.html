@@ -802,10 +802,18 @@
       // Intentar conectarse a Google Apps Script
       if (typeof google !== "undefined" && google.script && google.script.run) {
         // Inicializa base de datos y carga datos
-        google.script.run.withSuccessHandler((msg) => {
-          console.log(msg);
-          refreshAllData();
-        }).apiInitDatabase();
+        google.script.run
+          .withSuccessHandler((msg) => {
+            console.log(msg);
+            refreshAllData();
+          })
+          .withFailureHandler((err) => {
+            console.error("apiInitDatabase failed: ", err);
+            alert("Error al conectar con la base de datos de Google Sheets. Cargando modo demostración local. Error: " + err.message);
+            loadMockData();
+            renderAll();
+          })
+          .apiInitDatabase();
       } else {
         // Carga de datos mock si se ejecuta localmente
         console.log("Corriendo local sin entorno Google Apps Script.");
@@ -891,7 +899,7 @@
       const syncIcon = document.getElementById("syncIcon");
       syncIcon.classList.add("fa-spin");
       
-      let pendingRequests = 9;
+      let pendingRequests = 10;
       
       const checkDone = () => {
         pendingRequests--;
@@ -901,23 +909,37 @@
         }
       };
 
-      google.script.run.withSuccessHandler((rate) => {
-        state.tasaBcb = rate;
-        document.getElementById("sidebar-tasa").innerText = "Bs. " + rate.toFixed(4);
+      const handleFail = (err) => {
+        console.error("API call failed: ", err);
         checkDone();
-      }).apiGetBcbRate();
+      };
 
-      google.script.run.withSuccessHandler((kpis) => {
-        state.kpis = kpis;
-        checkDone();
-      }).apiGetDashboardKPIs();
+      google.script.run
+        .withSuccessHandler((rate) => {
+          state.tasaBcb = rate;
+          document.getElementById("sidebar-tasa").innerText = "Bs. " + rate.toFixed(4);
+          checkDone();
+        })
+        .withFailureHandler(handleFail)
+        .apiGetBcbRate();
+
+      google.script.run
+        .withSuccessHandler((kpis) => {
+          state.kpis = kpis;
+          checkDone();
+        })
+        .withFailureHandler(handleFail)
+        .apiGetDashboardKPIs();
 
       const sheets = ["Egresos", "Ventas", "Productos", "Clientes", "Recetas", "OrdenesProduccion", "Inventario", "Cestas"];
       sheets.forEach(sheetName => {
-        google.script.run.withSuccessHandler((data) => {
-          state[sheetName.toLowerCase()] = data;
-          checkDone();
-        }).apiReadAll(sheetName);
+        google.script.run
+          .withSuccessHandler((data) => {
+            state[sheetName.toLowerCase()] = data;
+            checkDone();
+          })
+          .withFailureHandler(handleFail)
+          .apiReadAll(sheetName);
       });
     }
 
