@@ -850,13 +850,8 @@
       }
     }
 
-    // Ejecutar inicialización inmediatamente si el documento ya está listo
-    if (document.readyState === "complete" || document.readyState === "interactive") {
-      initApp();
-    } else {
-      window.addEventListener("DOMContentLoaded", initApp);
-      window.addEventListener("load", initApp);
-    }
+    // Ejecutar inicialización inmediatamente y sin condiciones
+    initApp();
 
     // Cambiar de Pestaña (Tab Navigation)
     function switchTab(tabName) {
