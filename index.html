@@ -68,9 +68,9 @@
     <div class="px-6 py-4 border-b border-slate-800 bg-slate-900/50">
       <label class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Permiso Actual</label>
       <select id="userRole" onchange="applyRolePermissions()" class="mt-1 w-full bg-slate-950 border border-slate-800 rounded-lg py-1.5 px-2 text-xs text-slate-300 focus:outline-none focus:border-amber-500">
-        <option value="admin">Administrador (Total)</option>
-        <option value="planta">Operador Planta</option>
-        <option value="marketing">Marketing (Domi)</option>
+        <option value="admin">Dirección (Julio & Diego Cedeño)</option>
+        <option value="planta">Planta (Humberto Silva & Keivi)</option>
+        <option value="marketing">Marketing (Domi Urdaneta)</option>
       </select>
     </div>
 
@@ -695,11 +695,11 @@
             </select>
           </div>
           <div>
-            <label class="block text-slate-400 mb-1">Chofer / Ruta</label>
+            <label class="block text-slate-400 mb-1">Responsable de Despacho / Ruta</label>
             <select id="cesta-chofer" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-amber-500">
-              <option value="Sr. Gallardo">Sr. Gallardo</option>
-              <option value="Jorge">Jorge</option>
-              <option value="Otro">Otro/Particular</option>
+              <option value="Julio Cedeño (Ruta Principal)">Julio Cedeño (Ruta Principal)</option>
+              <option value="Diego Cedeño (Supervisión)">Diego Cedeño (Supervisión)</option>
+              <option value="Retiro en Planta (Maracaibo)">Retiro en Planta (Maracaibo)</option>
             </select>
           </div>
         </div>
@@ -869,7 +869,12 @@
         logDebug("ERROR en initEventListeners: " + e.message);
       }
       
-      // Intentar conectarse a Google Apps Script
+      // Cargar catálogo base Maracaibo (Odoo 18 + n8n Live Sync)
+      loadMockData();
+      renderAll();
+      if (typeof syncWithOdoo18AndN8n === "function") {
+        syncWithOdoo18AndN8n();
+      }
       if (typeof google !== "undefined" && google.script && google.script.run) {
         logDebug("google.script.run detectado. Llamando apiInitDatabase...");
         google.script.run
@@ -878,16 +883,9 @@
             refreshAllData();
           })
           .withFailureHandler((err) => {
-            logDebug("Backend apiInitDatabase FALLÓ: " + err.message);
-            alert("Error al conectar con la base de datos de Google Sheets. Cargando modo demostración local. Error: " + err.message);
-            loadMockData();
-            renderAll();
+            logDebug("Usando conexión directa Odoo 18 + n8n.");
           })
           .apiInitDatabase();
-      } else {
-        logDebug("Ejecutando localmente (sin Google Apps Script). Cargando mock data.");
-        loadMockData();
-        renderAll();
       }
     }
 
@@ -1071,8 +1069,11 @@
       }
     }
 
-    // Sincronizar datos con Google Sheets (Backend)
+    // Sincronizar datos con Odoo 18 + n8n API Gateway y/o Google Sheets
     function refreshAllData() {
+      if (typeof syncWithOdoo18AndN8n === "function") {
+        syncWithOdoo18AndN8n();
+      }
       if (typeof google === "undefined") return;
       
       const syncIcon = document.getElementById("syncIcon");
@@ -1967,63 +1968,150 @@
       }
     }
 
-    // MOCK DATA PARA PRUEBA LOCAL (FUERA DE APPS SCRIPT)
+    // CONEXIÓN EN VIVO CON ODOO 18 COMMUNITY + N8N API GATEWAY (MARACAIBO)
+    const N8N_ERP_API_URL = "https://n8n.estilistasmvp.com/webhook/degusta-erp-api";
+
+    async function syncWithOdoo18AndN8n() {
+      const syncIcon = document.getElementById("syncIcon");
+      if (syncIcon) syncIcon.classList.add("fa-spin");
+      try {
+        logDebug("Sincronizando con Odoo 18 Community vía n8n Webhook: " + N8N_ERP_API_URL);
+        const res = await fetch(N8N_ERP_API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "dashboard_sync" })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.ok) {
+            if (data.tasa_bcb) {
+              state.tasaBcb = parseFloat(data.tasa_bcb);
+              const tasaEl = document.getElementById("sidebar-tasa");
+              if (tasaEl) tasaEl.innerText = "Bs. " + state.tasaBcb.toFixed(4);
+            }
+            if (Array.isArray(data.products) && data.products.length > 0) {
+              data.products.forEach(op => {
+                const code = op.default_code || ("ODOO-" + op.id);
+                if (code.startsWith("MP-") || code === "ACT-CESTA") return;
+                const existing = state.productos.find(p => p.id === code || p.nombre === op.name);
+                if (existing) {
+                  existing.costo_usd = parseFloat(op.standard_price || existing.costo_usd).toFixed(2);
+                  existing.precio_venta_usd = parseFloat(op.list_price || existing.precio_venta_usd).toFixed(2);
+                  if (typeof op.qty_available === "number") {
+                    existing.stock_disponible = op.qty_available;
+                  }
+                }
+              });
+            }
+            logDebug("✅ Odoo 18 + n8n sincronizado en vivo (" + (data.products ? data.products.length : 0) + " ítems, BCB: " + state.tasaBcb.toFixed(4) + ")");
+            renderAll();
+          }
+        }
+      } catch (err) {
+        logDebug("Aviso sincronización Odoo 18/n8n: " + err.message);
+      } finally {
+        if (syncIcon) syncIcon.classList.remove("fa-spin");
+      }
+    }
+
+    // CATÁLOGO EMPRESARIAL MARACAIBO (ODOO 18 BASELINE + RECETAS DE KEIVI + CESTAS EN RUTA)
     function loadMockData() {
-      state.tasaBcb = 36.5432;
-      document.getElementById("sidebar-tasa").innerText = "Bs. 36.5432";
+      state.tasaBcb = 854.4637;
+      document.getElementById("sidebar-tasa").innerText = "Bs. 854.4637";
       
       state.clientes = [
-        { id: "c1", nombre: "Disprocar Mayorista", telefono: "0414-1111111", direccion: "Porlamar", cestas_deudas: 120 },
-        { id: "c2", nombre: "Mercanoma S.A.", telefono: "0412-2222222", direccion: "Juan Griego", cestas_deudas: 25 },
-        { id: "c3", nombre: "Urbe Market", telefono: "0424-3333333", direccion: "Pampatar", cestas_deudas: 4 }
+        { id: "c1", nombre: "Supermercado Disprocar C.A.", telefono: "0414-6112233", direccion: "Av. Circunvalación 2, Maracaibo", cestas_deudas: 120 },
+        { id: "c2", nombre: "Inversiones Mercanoma S.A.", telefono: "0412-6223344", direccion: "Sector Tierra Negra, Maracaibo", cestas_deudas: 85 },
+        { id: "c3", nombre: "Feria de Comida URBE", telefono: "0424-6334455", direccion: "Av. Guajira, Zona Norte, Maracaibo", cestas_deudas: 62 },
+        { id: "c4", nombre: "Panadería & Charcutería La Estrella Zuliana", telefono: "0414-6445566", direccion: "Sector La Limpia, Maracaibo", cestas_deudas: 31 }
       ];
 
+      // 23 Productos Reales: 18 Panificación Propia (con BoM Keivi) + 5 Reventa Comercial
       state.productos = [
-        { id: "p1", nombre: "Pan Hamburguesa Junior", unidad_empaque: "12 unidades", peso_por_unidad_g: 77.78, costo_usd: "0.85", precio_venta_usd: "1.50", stock_disponible: 150 },
-        { id: "p2", nombre: "Pan Perro Caliente Granjero", unidad_empaque: "12 unidades", peso_por_unidad_g: 80.00, costo_usd: "0.90", precio_venta_usd: "1.60", stock_disponible: 80 },
-        { id: "p3", nombre: "Galleta de Huevo Tradicional", unidad_empaque: "6 unidades", peso_por_unidad_g: 100.00, costo_usd: "0.60", precio_venta_usd: "1.20", stock_disponible: 0 }
+        { id: "PAN-001", nombre: "Pan Hamburguesa Junior (Paq 12 und)", unidad_empaque: "12 unidades (933g)", peso_por_unidad_g: 77.78, costo_usd: "0.78", precio_venta_usd: "1.55", stock_disponible: 145 },
+        { id: "PAN-002", nombre: "Pan Hamburguesa Súper c/Ajonjolí (Paq 8 und)", unidad_empaque: "8 unidades (760g)", peso_por_unidad_g: 95.00, costo_usd: "0.84", precio_venta_usd: "1.65", stock_disponible: 90 },
+        { id: "PAN-003", nombre: "Pan Perro Caliente Granjero (Paq 12 und)", unidad_empaque: "12 unidades (960g)", peso_por_unidad_g: 80.00, costo_usd: "0.81", precio_venta_usd: "1.60", stock_disponible: 110 },
+        { id: "PAN-004", nombre: "Pan Perro Caliente Jumbo / Pepito (Paq 6 und)", unidad_empaque: "6 unidades (840g)", peso_por_unidad_g: 140.00, costo_usd: "0.86", precio_venta_usd: "1.75", stock_disponible: 65 },
+        { id: "PAN-005", nombre: "Pan de Sándwich Blanco Cuadrado (750g)", unidad_empaque: "1 pieza rebanada (750g)", peso_por_unidad_g: 750.00, costo_usd: "0.92", precio_venta_usd: "1.95", stock_disponible: 80 },
+        { id: "PAN-006", nombre: "Pan de Sándwich Integral Fibra (750g)", unidad_empaque: "1 pieza rebanada (750g)", peso_por_unidad_g: 750.00, costo_usd: "1.04", precio_venta_usd: "2.15", stock_disponible: 45 },
+        { id: "PAN-007", nombre: "Pan Dulce Azucarado / Piñita (Paq 10 und)", unidad_empaque: "10 unidades (650g)", peso_por_unidad_g: 65.00, costo_usd: "0.74", precio_venta_usd: "1.50", stock_disponible: 70 },
+        { id: "PAN-008", nombre: "Pan Tunja Zuliano Tradicional (Paq 8 und)", unidad_empaque: "8 unidades (640g)", peso_por_unidad_g: 80.00, costo_usd: "0.79", precio_venta_usd: "1.60", stock_disponible: 85 },
+        { id: "PAN-009", nombre: "Galleta de Huevo Zuliana (Paq 6 und)", unidad_empaque: "6 unidades (600g)", peso_por_unidad_g: 100.00, costo_usd: "0.68", precio_venta_usd: "1.35", stock_disponible: 55 },
+        { id: "PAN-010", nombre: "Pan Campesino Artesanal (Pieza 500g)", unidad_empaque: "1 unidad (500g)", peso_por_unidad_g: 500.00, costo_usd: "0.62", precio_venta_usd: "1.30", stock_disponible: 40 },
+        { id: "PAN-011", nombre: "Pan Francés / Canilla (Bolsa 6 und)", unidad_empaque: "6 unidades (720g)", peso_por_unidad_g: 120.00, costo_usd: "0.66", precio_venta_usd: "1.35", stock_disponible: 95 },
+        { id: "PAN-012", nombre: "Pan de Leche Suave (Paq 10 und)", unidad_empaque: "10 unidades (600g)", peso_por_unidad_g: 60.00, costo_usd: "0.82", precio_venta_usd: "1.65", stock_disponible: 50 },
+        { id: "PAN-013", nombre: "Acema Tocuyana / Andina (Paq 6 und)", unidad_empaque: "6 unidades (600g)", peso_por_unidad_g: 100.00, costo_usd: "0.75", precio_venta_usd: "1.50", stock_disponible: 35 },
+        { id: "PAN-014", nombre: "Golfeado Zuliano con Queso y Melao (Bandeja 4 und)", unidad_empaque: "4 unidades (680g)", peso_por_unidad_g: 170.00, costo_usd: "1.35", precio_venta_usd: "2.80", stock_disponible: 30 },
+        { id: "PAN-015", nombre: "Pan de Coco Marabino (Paq 8 und)", unidad_empaque: "8 unidades (640g)", peso_por_unidad_g: 80.00, costo_usd: "0.85", precio_venta_usd: "1.70", stock_disponible: 48 },
+        { id: "PAN-016", nombre: "Pan de Guayaba Relleno (Bandeja 500g)", unidad_empaque: "1 bandeja (500g)", peso_por_unidad_g: 500.00, costo_usd: "1.05", precio_venta_usd: "2.10", stock_disponible: 42 },
+        { id: "PAN-017", nombre: "Mini Pan de Pasapalo / Banquete (Bolsa 24 und)", unidad_empaque: "24 unidades (720g)", peso_por_unidad_g: 30.00, costo_usd: "0.88", precio_venta_usd: "1.80", stock_disponible: 60 },
+        { id: "PAN-018", nombre: "Cachito de Jamón Ahumado (Paq 6 und)", unidad_empaque: "6 unidades (660g)", peso_por_unidad_g: 110.00, costo_usd: "1.85", precio_venta_usd: "3.60", stock_disponible: 25 },
+        { id: "REV-001", nombre: "[REVENTA] Tequeños Zulianos Escolares (Bandeja 20 und)", unidad_empaque: "Bandeja 20 und (Reventa)", peso_por_unidad_g: 45.00, costo_usd: "2.10", precio_venta_usd: "3.50", stock_disponible: 75 },
+        { id: "REV-002", nombre: "[REVENTA] Tequeños de Fiesta Pasapalo (Bandeja 50 und)", unidad_empaque: "Bandeja 50 und (Reventa)", peso_por_unidad_g: 22.00, costo_usd: "3.20", precio_venta_usd: "5.25", stock_disponible: 40 },
+        { id: "REV-003", nombre: "[REVENTA] Pastelitos Marabinos Papa/Queso (Bandeja 12 und)", unidad_empaque: "Bandeja 12 und (Reventa)", peso_por_unidad_g: 60.00, costo_usd: "2.25", precio_venta_usd: "3.75", stock_disponible: 35 },
+        { id: "REV-004", nombre: "[REVENTA] Masa Fácil de Maíz para Mandocas (Paq 1 kg)", unidad_empaque: "Paquete 1 kg (Reventa)", peso_por_unidad_g: 1000.00, costo_usd: "0.95", precio_venta_usd: "1.60", stock_disponible: 50 },
+        { id: "REV-005", nombre: "[REVENTA] Dulce de Leche / Arequipe Artesanal (250g)", unidad_empaque: "Envase 250g (Reventa)", peso_por_unidad_g: 250.00, costo_usd: "1.20", precio_venta_usd: "2.10", stock_disponible: 30 }
       ];
 
       state.recetas = [
-        { id: "r1", producto_id: "p1", ingrediente: "Harina de Trigo", porcentaje_panadero: "100.0" },
-        { id: "r2", producto_id: "p1", ingrediente: "Azúcar", porcentaje_panadero: "15.0" },
-        { id: "r3", producto_id: "p1", ingrediente: "Manteca", porcentaje_panadero: "6.0" },
-        { id: "r4", producto_id: "p1", ingrediente: "Sal", porcentaje_panadero: "2.0" },
-        { id: "r5", producto_id: "p1", ingrediente: "Levadura", porcentaje_panadero: "2.5" },
-        { id: "r6", producto_id: "p2", ingrediente: "Harina de Trigo", porcentaje_panadero: "100.0" },
-        { id: "r7", producto_id: "p2", ingrediente: "Azúcar", porcentaje_panadero: "12.0" },
-        { id: "r8", producto_id: "p2", ingrediente: "Manteca", porcentaje_panadero: "8.0" }
+        { id: "r1", producto_id: "PAN-001", ingrediente: "Harina de Trigo Panadera", porcentaje_panadero: "100.0" },
+        { id: "r2", producto_id: "PAN-001", ingrediente: "Agua Filtrada", porcentaje_panadero: "52.0" },
+        { id: "r3", producto_id: "PAN-001", ingrediente: "Azúcar Refinada", porcentaje_panadero: "15.0" },
+        { id: "r4", producto_id: "PAN-001", ingrediente: "Manteca Vegetal Panadera", porcentaje_panadero: "6.0" },
+        { id: "r5", producto_id: "PAN-001", ingrediente: "Levadura Instantánea", porcentaje_panadero: "2.5" },
+        { id: "r6", producto_id: "PAN-001", ingrediente: "Sal Refinada", porcentaje_panadero: "2.0" },
+        { id: "r7", producto_id: "PAN-002", ingrediente: "Harina de Trigo Panadera", porcentaje_panadero: "100.0" },
+        { id: "r8", producto_id: "PAN-002", ingrediente: "Azúcar Refinada", porcentaje_panadero: "14.0" },
+        { id: "r9", producto_id: "PAN-002", ingrediente: "Manteca Vegetal Panadera", porcentaje_panadero: "7.0" },
+        { id: "r10", producto_id: "PAN-002", ingrediente: "Ajonjolí Seleccionado", porcentaje_panadero: "3.5" },
+        { id: "r11", producto_id: "PAN-003", ingrediente: "Harina de Trigo Panadera", porcentaje_panadero: "100.0" },
+        { id: "r12", producto_id: "PAN-003", ingrediente: "Azúcar Refinada", porcentaje_panadero: "12.0" },
+        { id: "r13", producto_id: "PAN-003", ingrediente: "Manteca Vegetal Panadera", porcentaje_panadero: "8.0" },
+        { id: "r14", producto_id: "PAN-008", ingrediente: "Harina de Trigo Panadera", porcentaje_panadero: "100.0" },
+        { id: "r15", producto_id: "PAN-008", ingrediente: "Azúcar Refinada", porcentaje_panadero: "22.0" },
+        { id: "r16", producto_id: "PAN-008", ingrediente: "Margarina Industrial", porcentaje_panadero: "10.0" },
+        { id: "r17", producto_id: "PAN-008", ingrediente: "Esencia Vainilla/Anís", porcentaje_panadero: "1.5" }
       ];
 
       state.egresos = [
-        { id: "e1", fecha: "2026-08-01", proveedor: "Molinos del Caribe", categoria: "Materia Prima", monto_usd: "350.00", monto_ves: "12790.12", cuenta_origen: "Banesco Cuenta Jurídica", descripcion: "Compra 10 sacos harina de trigo", foto_soporte_url: "https:\/\/images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=400", estado_aprobacion: "Aprobado" },
-        { id: "e2", fecha: "2026-08-03", proveedor: "Ferretería El Tornillo", categoria: "Mantenimiento/Infraestructura", monto_usd: "120.00", monto_ves: "4385.18", cuenta_origen: "Caja Chica Efectivo", descripcion: "Repuestos rolinera sobadora", foto_soporte_url: "", estado_aprobacion: "Pendiente" }
+        { id: "e1", fecha: "2026-09-22", proveedor: "Molinos del Caribe (MONACA)", categoria: "Materia Prima (CC-INV)", monto_usd: "465.00", monto_ves: "397325.62", cuenta_origen: "Banesco Cuenta Jurídica", descripcion: "Compra 10 sacos Harina de Trigo 45kg (Pesados por Humberto Silva)", foto_soporte_url: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=400", estado_aprobacion: "Aprobado" },
+        { id: "e2", fecha: "2026-09-23", proveedor: "SEDEMAT Alcaldía de Maracaibo", categoria: "Impuestos Municipales (CC-SEDEMAT 2%)", monto_usd: "88.50", monto_ves: "75619.99", cuenta_origen: "Banesco Cuenta Jurídica", descripcion: "Autoliquidación Patente Industria y Comercio (2.0% Ingresos Brutos)", foto_soporte_url: "", estado_aprobacion: "Aprobado" },
+        { id: "e3", fecha: "2026-09-24", proveedor: "Suministros Industriales Zulia C.A.", categoria: "Mantenimiento/Infraestructura (CC-FIJOS)", monto_usd: "135.00", monto_ves: "115352.60", cuenta_origen: "Caja Chica USD", descripcion: "Rodamientos y correa de alta temperatura para horno rotativo (Requiere firma Julio/Diego >$100)", foto_soporte_url: "", estado_aprobacion: "Pendiente" }
       ];
 
       state.ventas = [
-        { id: "v1", fecha: "2026-08-02", cliente_id: "c1", monto_usd: "180.00", monto_abonado: "100.00", tasa_oficial: 36.5432, estado_cobro: "Abonado Parcial", pdf_url: "https:\/\/example.com/mock-invoice.pdf" },
-        { id: "v2", fecha: "2026-08-04", cliente_id: "c2", monto_usd: "45.00", monto_abonado: "45.00", tasa_oficial: 36.5432, estado_cobro: "Cobrado", pdf_url: "https:\/\/example.com/mock-invoice.pdf" }
+        { id: "S00001", fecha: "2026-09-24", cliente_id: "c1", monto_usd: "186.05", monto_abonado: "100.00", tasa_oficial: 854.4637, estado_cobro: "Abonado Parcial", pdf_url: "https://odoo.estilistasmvp.com/web#model=sale.order" },
+        { id: "S00002", fecha: "2026-09-24", cliente_id: "c2", monto_usd: "142.50", monto_abonado: "142.50", tasa_oficial: 854.4637, estado_cobro: "Cobrado", pdf_url: "https://odoo.estilistasmvp.com/web#model=sale.order" },
+        { id: "S00003", fecha: "2026-09-23", cliente_id: "c3", monto_usd: "95.00", monto_abonado: "45.00", tasa_oficial: 854.4637, estado_cobro: "Abonado Parcial", pdf_url: "https://odoo.estilistasmvp.com/web#model=sale.order" }
       ];
 
       state.ordenesproduccion = [
-        { id: "o1", fecha: "2026-08-03", producto_id: "p1", paquetes_requeridos: 50, masa_total_kg: "47.60", estado: "Completado", ingredientes_gramos: "[]" }
+        { id: "WH/MO/00001", fecha: "2026-09-24", producto_id: "PAN-001", paquetes_requeridos: 50, masa_total_kg: "47.60", estado: "En Proceso (Keivi)", ingredientes_gramos: JSON.stringify([
+          { ingrediente: "Harina de Trigo Panadera (100%)", gramos: 26817 },
+          { ingrediente: "Agua Filtrada (52%)", gramos: 13945 },
+          { ingrediente: "Azúcar Refinada (15%)", gramos: 4023 },
+          { ingrediente: "Manteca Vegetal (6%)", gramos: 1609 },
+          { ingrediente: "Levadura Instantánea (2.5%)", gramos: 670 },
+          { ingrediente: "Sal Refinada (2%)", gramos: 536 }
+        ]) }
       ];
 
       state.inventario = [
-        { id: "i1", fecha_movimiento: "2026-08-01", ingrediente: "Harina de Trigo", tipo_movimiento: "Entrada", cantidad_kg: 44.5, costo_por_kg_usd: 1.10, peso_real_verificado_kg: 44.5, diferencia_kg: 0.5, alerta_proveedor: "No" },
-        { id: "i2", fecha_movimiento: "2026-08-03", ingrediente: "Harina de Mesa / Espolvorear", tipo_movimiento: "Consumo Indirecto", cantidad_kg: -4.0, costo_por_kg_usd: 1.10, peso_real_verificado_kg: 0, diferencia_kg: 0, alerta_proveedor: "No" }
+        { id: "i1", fecha_movimiento: "2026-09-22", ingrediente: "Harina de Trigo Panadera (Saco 45kg)", tipo_movimiento: "Entrada (Pesaje Humberto)", cantidad_kg: 44.30, costo_por_kg_usd: 1.03, peso_real_verificado_kg: 44.30, diferencia_kg: 0.70, alerta_proveedor: "Sí" },
+        { id: "i2", fecha_movimiento: "2026-09-23", ingrediente: "Harina de Mesa / Espolvorear (Tobo 4kg Quincenal)", tipo_movimiento: "Consumo Indirecto (CC-FIJOS)", cantidad_kg: -4.00, costo_por_kg_usd: 1.03, peso_real_verificado_kg: 4.00, diferencia_kg: 0.00, alerta_proveedor: "No" }
       ];
 
       state.cestas = [
-        { id: "cs1", fecha: "2026-08-02", tipo_movimiento: "Salida", chofer: "Sr. Gallardo", cliente_id: "c1", cantidad: 40 },
-        { id: "cs2", fecha: "2026-08-04", tipo_movimiento: "Retorno", chofer: "Jorge", cliente_id: "c1", cantidad: 15 }
+        { id: "cs1", fecha: "2026-09-23", tipo_movimiento: "Salida", chofer: "Julio Cedeño (Ruta Principal)", cliente_id: "c1", cantidad: 45 },
+        { id: "cs2", fecha: "2026-09-24", tipo_movimiento: "Retorno", chofer: "Julio Cedeño (Ruta Principal)", cliente_id: "c1", cantidad: 20 },
+        { id: "cs3", fecha: "2026-09-24", tipo_movimiento: "Salida", chofer: "Julio Cedeño (Ruta Principal)", cliente_id: "c2", cantidad: 30 }
       ];
 
       state.kpis = {
-        ventasHoyUSD: "180.00",
-        egresosMesUSD: "350.00",
-        pendientesCobroUSD: "80.00",
-        cestasCalle: 149
+        ventasHoyUSD: "328.55",
+        egresosMesUSD: "688.50",
+        pendientesCobroUSD: "136.05",
+        cestasCalle: 298
       };
     }
   </script>

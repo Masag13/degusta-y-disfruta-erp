@@ -3,3 +3,4 @@ bin/
 *.zip
 .system_generated/
 *.log
+.env

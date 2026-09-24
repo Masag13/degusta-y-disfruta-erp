@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Evaluación de Capacidades y RRHH - Degusta y Disfruta C.A.</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #d97706;
+      --primary-dark: #b45309;
+      --primary-light: #fef3c7;
+      --secondary: #1e293b;
+      --accent: #10b981;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --text-muted: #64748b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding-bottom: 50px; }
+    
+    header {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      color: white;
+      padding: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
+    .header-container { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+    .brand h1 { font-size: 1.5rem; font-weight: 700; color: #f59e0b; }
+    .brand p { font-size: 0.875rem; color: #cbd5e1; }
+    
+    .nav-tabs { display: flex; gap: 10px; }
+    .nav-btn {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 0.875rem;
+      transition: all 0.2s;
+    }
+    .nav-btn.active, .nav-btn:hover { background: #f59e0b; color: #1e293b; font-weight: 600; border-color: #f59e0b; }
+
+    .main-container { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
+    
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #0f172a;
+      border-bottom: 2px solid var(--primary-light);
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-badge {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+    
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-size: 0.875rem; font-weight: 600; color: #334155; margin-bottom: 6px; }
+    .help-text { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
+    
+    input[type="text"], select, textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-size: 0.9rem;
+      background: #fdfdfd;
+      transition: border-color 0.2s;
+    }
+    input[type="text"]:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+    }
+    
+    .scale-container {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .scale-card {
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: #fafafa;
+    }
+    .scale-card input { display: none; }
+    .scale-card .num { font-size: 1.25rem; font-weight: 700; color: #475569; }
+    .scale-card .desc { font-size: 0.75rem; color: #64748b; margin-top: 4px; line-height: 1.2; }
+    .scale-card:hover { border-color: #cbd5e1; background: #fff; }
+    .scale-card.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    .scale-card.selected .num { color: var(--primary-dark); }
+    .scale-card.selected .desc { color: #92400e; font-weight: 500; }
+    
+    .btn-submit {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px -1px rgba(217, 119, 6, 0.3);
+      width: 100%;
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+    .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 8px -1px rgba(217, 119, 6, 0.4); }
+
+    /* Table styles for Supervisor View */
+    .table-container { overflow-x: auto; margin-top: 15px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background: #f1f5f9; color: #334155; font-weight: 600; position: sticky; top: 0; }
+    tr:hover td { background: #f8fafc; }
+    
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .badge-success { background: #dcfce7; color: #166534; }
+    .badge-warning { background: #fef9c3; color: #854d0e; }
+    .badge-danger { background: #fee2e2; color: #991b1b; }
+    .badge-info { background: #e0f2fe; color: #075985; }
+
+    .input-supervisor {
+      width: 55px;
+      padding: 4px 6px;
+      border-radius: 4px;
+      border: 1px solid #cbd5e1;
+      text-align: center;
+      font-weight: bold;
+      background: #fffbeb;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-container">
+    <div class="brand">
+      <h1>Degusta y Disfruta C.A.</h1>
+      <p>Plataforma de Inventario de Capacidades y Evaluación de Valores</p>
+    </div>
+    <div class="nav-tabs">
+      <button class="nav-btn active" onclick="showTab('colaborador')">📝 Formulario Colaborador</button>
+      <button class="nav-btn" onclick="showTab('supervisor')">📊 Panel Supervisor / Sheets</button>
+    </div>
+  </div>
+</header>
+
+<div class="main-container">
+  
+  <!-- VISTA COLABORADOR -->
+  <div id="tab-colaborador">
+    <div class="card" style="border-left: 5px solid #f59e0b;">
+      <h2 style="font-size: 1.3rem; margin-bottom: 8px;">Diagnóstico de Capacidades Individuales</h2>
+      <p style="font-size: 0.875rem; color: #475569; line-height: 1.5;">
+        Este cuestionario tiene como propósito registrar tus habilidades operativas y tu vivencia de los 4 valores de nuestra empresa: <strong>Competente, Confiable, Compromiso y Responsable</strong>.
+      </p>
+    </div>
+
+    <form id="evalForm" onsubmit="guardarEvaluacion(event)">
+      <!-- Sección 1 -->
+      <div class="card">
+        <div class="section-title">
+          <span>1. Identificación y Puesto de Trabajo</span>
+          <span class="section-badge">Datos Generales</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          <div class="form-group">
+            <label>Nombre y Apellido *</label>
+            <input type="text" id="nombre" placeholder="Ej: Carlos Mendoza" required>
+          </div>
+          <div class="form-group">
+            <label>Cargo Actual *</label>
+            <select id="cargo" required>
+              <option value="">Seleccione su cargo...</option>
+              <option value="Gerencia General / Dirección">Gerencia General / Dirección</option>
+              <option value="Gerente de Producción">Gerente de Producción</option>
+              <option value="Maestro Panadero / Hornero">Maestro Panadero / Hornero</option>
+              <option value="Operario de Planta / Sobadora">Operario de Planta / Sobadora</option>
+              <option value="Administración y Facturación">Administración y Facturación</option>
+              <option value="Logística, Almacén y Despacho">Logística, Almacén y Despacho</option>
+              <option value="Comercial y Marketing">Comercial y Marketing</option>
+              <option value="Mantenimiento">Mantenimiento</option>
+            </select>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          <div class="form-group">
+            <label>Departamento *</label>
+            <select id="depto" required>
+              <option value="Producción y Planta">Producción y Planta</option>
+              <option value="Administración y Finanzas">Administración y Finanzas</option>
+              <option value="Logística y Despacho">Logística y Despacho</option>
+              <option value="Comercial y Redes">Comercial y Redes</option>
+              <option value="Dirección">Dirección</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Antigüedad *</label>
+            <select id="antiguedad" required>
+              <option value="Menos de 6 meses">Menos de 6 meses</option>
+              <option value="6 meses a 1 año">6 meses a 1 año</option>
+              <option value="1 a 3 años">1 a 3 años</option>
+              <option value="Más de 3 años">Más de 3 años</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección 2: Competente -->
+      <div class="card">
+        <div class="section-title">
+          <span>2. Pilar: COMPETENTE</span>
+          <span class="section-badge">Destreza Técnica</span>
+        </div>
+        <div class="form-group">
+          <label>Autocalificación de Dominio Técnico (1 al 4) *</label>
+          <div class="scale-container" id="scale-competente">
+            <div class="scale-card" onclick="selectScale('competente', 1, this)">
+              <div class="num">1</div>
+              <div class="desc">Básico / Con Supervisión</div>
+            </div>
+            <div class="scale-card selected" onclick="selectScale('competente', 2, this)">
+              <div class="num">2</div>
+              <div class="desc">Intermedio / Autónomo</div>
+            </div>
+            <div class="scale-card" onclick="selectScale('competente', 3, this)">
+              <div class="num">3</div>
+              <div class="desc">Avanzado / Sobresaliente</div>
+            </div>
+            <div class="scale-card" onclick="selectScale('competente', 4, this)">
+              <div class="num">4</div>
+              <div class="desc">Experto / Formador</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>¿Qué maquinarias, sistemas o recetas dominas con total autonomía? *</label>
+          <textarea id="resp-competente" rows="2" placeholder="Ej: Manejo de amasadora y hornos rotativos, control de formulaciones..." required></textarea>
+        </div>
+      </div>
+
+      <!-- Sección 3: Confiable -->
+      <div class="card">
+        <div class="section-title">
+          <span>3. Pilar: CONFIABLE</span>
+          <span class="section-badge">Calidad y Consistencia</span>
+        </div>
+        <div class="form-group">
+          <label>Autocalificación de Consistencia y Cero Errores (1 al 4) *</label>
+          <div class="scale-container" id="scale-confiable">
+            <div class="scale-card" onclick="selectScale('confiable', 1, this)"><div class="num">1</div><div class="desc">Revisiones Frecuentes</div></div>
+            <div class="scale-card" onclick="selectScale('confiable', 2, this)"><div class="num">2</div><div class="desc">Rutinario sin Fallas</div></div>
+            <div class="scale-card selected" onclick="selectScale('confiable', 3, this)"><div class="num">3</div><div class="desc">Alto Rigor / Impecable</div></div>
+            <div class="scale-card" onclick="selectScale('confiable', 4, this)"><div class="num">4</div><div class="desc">Auditor / Referente</div></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>¿Cómo aseguras la calidad de tus entregables antes de despachar o entregar? *</label>
+          <textarea id="resp-confiable" rows="2" placeholder="Ej: Pesaje exacto, verificación de empaques y temperaturas..." required></textarea>
+        </div>
+      </div>
+
+      <!-- Sección 4: Compromiso -->
+      <div class="card">
+        <div class="section-title">
+          <span>4. Pilar: COMPROMISO</span>
+          <span class="section-badge">Proactividad y Equipo</span>
+        </div>
+        <div class="form-group">
+          <label>Autocalificación de Iniciativa y Sentido de Pertenencia (1 al 4) *</label>
+          <div class="scale-container" id="scale-compromiso">
+            <div class="scale-card" onclick="selectScale('compromiso', 1, this)"><div class="num">1</div><div class="desc">Cumplo lo básico</div></div>
+            <div class="scale-card" onclick="selectScale('compromiso', 2, this)"><div class="num">2</div><div class="desc">Buena disposición</div></div>
+            <div class="scale-card selected" onclick="selectScale('compromiso', 3, this)"><div class="num">3</div><div class="desc">Proactivo y Colaborador</div></div>
+            <div class="scale-card" onclick="selectScale('compromiso', 4, this)"><div class="num">4</div><div class="desc">Motor de Equipo / Líder</div></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>¿Qué aporte de mejora o ahorro has propuesto recientemente? *</label>
+          <textarea id="resp-compromiso" rows="2" placeholder="Ej: Reorganización del área de enfriamiento para reducir tiempos..." required></textarea>
+        </div>
+      </div>
+
+      <!-- Sección 5: Responsable -->
+      <div class="card">
+        <div class="section-title">
+          <span>5. Pilar: RESPONSABLE</span>
+          <span class="section-badge">Rendición de Cuentas y Activos</span>
+        </div>
+        <div class="form-group">
+          <label>Autocalificación de Responsabilidad y Cuidado de Recursos (1 al 4) *</label>
+          <div class="scale-container" id="scale-responsable">
+            <div class="scale-card" onclick="selectScale('responsable', 1, this)"><div class="num">1</div><div class="desc">Ocasional Demora</div></div>
+            <div class="scale-card" onclick="selectScale('responsable', 2, this)"><div class="num">2</div><div class="desc">Cumple y Cuida</div></div>
+            <div class="scale-card selected" onclick="selectScale('responsable', 3, this)"><div class="num">3</div><div class="desc">Puntual y Protector</div></div>
+            <div class="scale-card" onclick="selectScale('responsable', 4, this)"><div class="num">4</div><div class="desc">Guardián de Recursos</div></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>¿Cómo actúas ante un imprevisto o error involuntario para solucionarlo? *</label>
+          <textarea id="resp-responsable" rows="2" placeholder="Ej: Notifico de inmediato al supervisor y ejecuto plan de contingencia..." required></textarea>
+        </div>
+      </div>
+
+      <!-- Sección 6: Formación -->
+      <div class="card">
+        <div class="section-title">
+          <span>6. Proyección y Capacitación</span>
+          <span class="section-badge">Desarrollo Futuro</span>
+        </div>
+        <div class="form-group">
+          <label>¿Qué habilidades técnicas o cursos te gustaría aprender en los próximos 6 meses? *</label>
+          <textarea id="resp-formacion" rows="2" placeholder="Ej: Control de costos, mantenimiento preventivo de sobadoras..." required></textarea>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit">💾 Enviar Evaluación de Capacidades</button>
+    </form>
+  </div>
+
+  <!-- VISTA SUPERVISOR / SHEETS -->
+  <div id="tab-supervisor" style="display: none;">
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <div>
+          <h2 style="font-size: 1.3rem;">Matriz de Corroboración y Calibración de Supervisión</h2>
+          <p style="font-size: 0.85rem; color: #64748b;">Contrasta las autoevaluaciones del personal, califica su desempeño real (1 al 4) y revisa brechas.</p>
+        </div>
+        <button class="nav-btn" style="background:#0f172a; color:#fff;" onclick="exportarCSV()">📥 Descargar CSV para Google Sheets</button>
+      </div>
+
+      <div class="table-container">
+        <table id="tabla-supervisor">
+          <thead>
+            <tr>
+              <th>Colaborador</th>
+              <th>Cargo</th>
+              <th>Auto Prom</th>
+              <th>Sup. Comp</th>
+              <th>Sup. Conf</th>
+              <th>Sup. Compr</th>
+              <th>Sup. Resp</th>
+              <th>Sup Prom</th>
+              <th>Brecha (Gap)</th>
+              <th>Diagnóstico</th>
+              <th>Estado Talento</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-cuerpo">
+            <!-- Filas dinámicas -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let scales = {
+    competente: 2,
+    confiable: 3,
+    compromiso: 3,
+    responsable: 3
+  };
+
+  // Base de datos local inicial con casos de prueba basados en el contexto de Degusta y Disfruta
+  let colaboradores = [
+    {
+      id: 1,
+      nombre: "Humberto Silva",
+      cargo: "Gerente de Producción",
+      depto: "Producción y Planta",
+      auto: { comp: 4, conf: 4, compr: 4, resp: 4 },
+      sup: { comp: 4, conf: 4, compr: 4, resp: 4 },
+      formacion: "Costeo avanzado y control de formulaciones automatizadas"
+    },
+    {
+      id: 2,
+      nombre: "Kevin (Panadero)",
+      cargo: "Maestro Panadero / Hornero",
+      depto: "Producción y Planta",
+      auto: { comp: 3, conf: 4, compr: 4, resp: 3 },
+      sup: { comp: 3, conf: 3, compr: 4, resp: 3 },
+      formacion: "Estandarización de masas para panes de hamburguesa y perros"
+    },
+    {
+      id: 3,
+      nombre: "Sophie / Domi Urdaneta",
+      cargo: "Comercial y Marketing",
+      depto: "Mercadeo y Ventas",
+      auto: { comp: 3, conf: 3, compr: 4, resp: 3 },
+      sup: { comp: 4, conf: 4, compr: 4, resp: 4 },
+      formacion: "Estrategias B2B y catálogo digital en tiempo real"
+    }
+  ];
+
+  function showTab(tab) {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    if (tab === 'colaborador') {
+      document.getElementById('tab-colaborador').style.display = 'block';
+      document.getElementById('tab-supervisor').style.display = 'none';
+      event.target.classList.add('active');
+    } else {
+      document.getElementById('tab-colaborador').style.display = 'none';
+      document.getElementById('tab-supervisor').style.display = 'block';
+      event.target.classList.add('active');
+      renderTablaSupervisor();
+    }
+  }
+
+  function selectScale(pillar, value, elem) {
+    scales[pillar] = value;
+    const container = document.getElementById('scale-' + pillar);
+    container.querySelectorAll('.scale-card').forEach(c => c.classList.remove('selected'));
+    elem.classList.add('selected');
+  }
+
+  function guardarEvaluacion(e) {
+    e.preventDefault();
+    const nuevo = {
+      id: colaboradores.length + 1,
+      nombre: document.getElementById('nombre').value,
+      cargo: document.getElementById('cargo').value,
+      depto: document.getElementById('depto').value,
+      auto: {
+        comp: scales.competente,
+        conf: scales.confiable,
+        compr: scales.compromiso,
+        resp: scales.responsable
+      },
+      sup: {
+        comp: scales.competente,
+        conf: scales.confiable,
+        compr: scales.compromiso,
+        resp: scales.responsable
+      },
+      formacion: document.getElementById('resp-formacion').value
+    };
+    colaboradores.push(nuevo);
+    alert('✅ Evaluación registrada con éxito para ' + nuevo.nombre + '. Puedes verla y calibrarla en la pestaña "Panel Supervisor / Sheets".');
+    document.getElementById('evalForm').reset();
+    showTab('supervisor');
+  }
+
+  function renderTablaSupervisor() {
+    const tbody = document.getElementById('tabla-cuerpo');
+    tbody.innerHTML = '';
+
+    colaboradores.forEach((colab, idx) => {
+      const autoProm = ((colab.auto.comp + colab.auto.conf + colab.auto.compr + colab.auto.resp) / 4).toFixed(1);
+      const supProm = ((colab.sup.comp + colab.sup.conf + colab.sup.compr + colab.sup.resp) / 4).toFixed(1);
+      const gap = (supProm - autoProm).toFixed(1);
+
+      let diagBadge = '<span class="badge badge-info">Alineado</span>';
+      if (gap > 0.4) diagBadge = '<span class="badge badge-success">Modesto / Alto Potencial</span>';
+      if (gap < -0.4) diagBadge = '<span class="badge badge-warning">Sobrestima Capacidad</span>';
+
+      let talentoBadge = '<span class="badge badge-success">⭐ Alto Potencial</span>';
+      if (supProm < 3.5 && supProm >= 2.5) talentoBadge = '<span class="badge badge-info">✅ Competente y Estable</span>';
+      if (supProm < 2.5 && supProm >= 1.8) talentoBadge = '<span class="badge badge-warning">⚠️ En Desarrollo</span>';
+      if (supProm < 1.8) talentoBadge = '<span class="badge badge-danger">🚨 Capacitación Urgente</span>';
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><strong>${colab.nombre}</strong></td>
+        <td><small>${colab.cargo}</small></td>
+        <td style="font-weight:600; color:#475569;">${autoProm}</td>
+        <td><input type="number" min="1" max="4" class="input-supervisor" value="${colab.sup.comp}" onchange="updateScore(${idx}, 'comp', this.value)"></td>
+        <td><input type="number" min="1" max="4" class="input-supervisor" value="${colab.sup.conf}" onchange="updateScore(${idx}, 'conf', this.value)"></td>
+        <td><input type="number" min="1" max="4" class="input-supervisor" value="${colab.sup.compr}" onchange="updateScore(${idx}, 'compr', this.value)"></td>
+        <td><input type="number" min="1" max="4" class="input-supervisor" value="${colab.sup.resp}" onchange="updateScore(${idx}, 'resp', this.value)"></td>
+        <td style="font-weight:700; color:#1e293b;">${supProm}</td>
+        <td style="font-weight:600; color:${gap < 0 ? '#b91c1c' : '#15803d'};">${gap > 0 ? '+' : ''}${gap}</td>
+        <td>${diagBadge}</td>
+        <td>${talentoBadge}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function updateScore(index, pillar, val) {
+    const num = parseFloat(val) || 1;
+    colaboradores[index].sup[pillar] = Math.min(4, Math.max(1, num));
+    renderTablaSupervisor();
+  }
+
+  function exportarCSV() {
+    let csv = "Colaborador,Cargo,Depto,Auto Prom,Sup Comp,Sup Conf,Sup Compr,Sup Resp,Sup Prom,Brecha,Formacion\n";
+    colaboradores.forEach(c => {
+      const autoP = ((c.auto.comp + c.auto.conf + c.auto.compr + c.auto.resp) / 4).toFixed(1);
+      const supP = ((c.sup.comp + c.sup.conf + c.sup.compr + c.sup.resp) / 4).toFixed(1);
+      const g = (supP - autoP).toFixed(1);
+      csv += `"${c.nombre}","${c.cargo}","${c.depto}",${autoP},${c.sup.comp},${c.sup.conf},${c.sup.compr},${c.sup.resp},${supP},${g},"${c.formacion}"\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute("download", "Evaluacion_Talento_Degusta_y_Disfruta.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+</script>
+
+</body>
+</html>
