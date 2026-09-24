@@ -216,9 +216,14 @@
           <button onclick="setNivelVistaReceta('SOLO_PAN')" id="btnNivelRec-SOLO_PAN" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-hueso text-choco">🥖 1. Productos Terminados (Por Unidad)</button>
           <button onclick="setNivelVistaReceta('SOLO_EMPAQUE')" id="btnNivelRec-SOLO_EMPAQUE" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-hueso text-choco">🛍️ 2. Productos para la Venta (Empaques)</button>
         </div>
-        <button onclick="abrirModalFormulaDyD(null)" class="bg-choco hover:bg-chocoDark text-hueso font-extrabold py-2 px-4 rounded-xl text-xs shadow">
-          ➕ Nuevo Producto / Empaque
-        </button>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="abrirModalListaPreciosMP()" class="bg-caramelo hover:opacity-95 text-huesoClaro font-extrabold py-2 px-3.5 rounded-xl text-xs shadow">
+            💲 Precios Materia Prima
+          </button>
+          <button onclick="abrirModalFormulaDyD(null)" class="bg-choco hover:bg-chocoDark text-hueso font-extrabold py-2 px-4 rounded-xl text-xs shadow">
+            ➕ Nuevo Producto / Empaque
+          </button>
+        </div>
       </div>
 
       <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row gap-2 items-center justify-between">
@@ -239,7 +244,15 @@
          2. INVENTARIO
          ======================================================================= -->
     <section id="tab-inventario" class="tab-content space-y-4">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <button onclick="abrirModalListaPreciosMP()" class="p-3.5 rounded-2xl bg-choco text-hueso shadow text-left flex items-center justify-between border-2 border-caramelo">
+          <div>
+            <h3 class="font-extrabold text-sm">💲 Lista de Precios MP</h3>
+            <p class="text-[11px] opacity-90">Actualizar costos de materia prima</p>
+          </div>
+          <i data-lucide="dollar-sign" class="w-6 h-6 shrink-0"></i>
+        </button>
+
         <button onclick="abrirModalCompra()" class="p-3.5 rounded-2xl bg-salvia text-huesoClaro shadow text-left flex items-center justify-between">
           <div>
             <h3 class="font-extrabold text-sm">➕ Registrar Compra</h3>
@@ -366,7 +379,10 @@
             <h3 class="text-sm font-extrabold text-choco">3. Precio de Venta por Empaque Comercial (Panes + Bolsa + Precinto + Etiqueta)</h3>
             <p class="text-[11px] font-semibold text-slate-500">El pan por unidad solo aporta su costo; el Precio de Venta se fija sobre el paquete empacado.</p>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="abrirModalListaPreciosMP()" class="px-3 py-1.5 bg-caramelo text-huesoClaro rounded-lg text-xs font-extrabold shadow">
+              💲 Precios Materia Prima
+            </button>
             <span class="text-xs font-bold">Margen global (%):</span>
             <input type="number" id="inputMargenGlobalFin" value="45" class="w-14 px-2 py-1 border border-slate-300 rounded-lg text-xs font-extrabold text-center">
             <button onclick="aplicarMargenGlobalFin()" class="px-3 py-1.5 bg-choco text-hueso rounded-lg text-xs font-bold">Aplicar a Empaques</button>
@@ -876,6 +892,36 @@
       </div>
       <div class="flex justify-end gap-2 pt-2 border-t border-slate-200">
         <button onclick="guardarCambiosMaestroMaterial()" class="px-4 py-2 bg-choco text-hueso font-extrabold rounded-xl">💾 Guardar Cambios</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL LISTA RÁPIDA DE PRECIOS DE MATERIA PRIMA Y EMPAQUE ================= -->
+  <div id="modalListaPreciosMP" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 no-print">
+    <div class="bg-white w-full max-w-4xl rounded-3xl shadow-2xl max-h-[90vh] flex flex-col overflow-hidden text-xs">
+      <div class="p-3.5 bg-choco text-hueso flex justify-between items-center">
+        <div>
+          <h3 class="font-extrabold text-sm">💲 Lista de Precios de Materia Prima y Empaque</h3>
+          <span class="text-[11px] text-hueso/85">Al cambiar cualquier precio, se recalculan todas las recetas de pan y los paquetes en Finanzas.</span>
+        </div>
+        <button onclick="document.getElementById('modalListaPreciosMP').classList.add('hidden')" class="p-1.5 bg-chocoDark rounded-xl text-hueso font-bold">✕</button>
+      </div>
+
+      <div class="p-3 bg-huesoClaro border-b border-huesoBorde flex flex-col sm:flex-row gap-2 items-center justify-between">
+        <input type="text" id="buscarPrecioMPInput" oninput="renderizarListaPreciosMP()" placeholder="Buscar harina, azúcar, levadura, bolsa, precinto..."
+          class="w-full sm:flex-1 px-3 py-2 bg-white border border-huesoBorde rounded-xl font-bold text-choco">
+        <div class="flex gap-1.5 shrink-0">
+          <button onclick="setFiltroPreciosMP('TODOS')" id="btnF PrecioMP-TODOS" class="px-3 py-1.5 rounded-xl font-bold bg-choco text-hueso">Todos</button>
+          <button onclick="setFiltroPreciosMP('MATERIA_PRIMA')" id="btnF PrecioMP-MATERIA_PRIMA" class="px-3 py-1.5 rounded-xl font-bold bg-hueso text-choco">🌾 Materia Prima</button>
+          <button onclick="setFiltroPreciosMP('EMPAQUE')" id="btnF PrecioMP-EMPAQUE" class="px-3 py-1.5 rounded-xl font-bold bg-hueso text-choco">🏷️ Empaque</button>
+        </div>
+      </div>
+
+      <div id="contenedorFilasPreciosMP" class="p-3 overflow-y-auto space-y-2 flex-1"></div>
+
+      <div class="p-3 bg-huesoClaro border-t border-huesoBorde flex justify-between items-center">
+        <span class="text-[11px] font-bold text-choco">✔ Los cambios se guardan y actualizan los costos automáticamente</span>
+        <button onclick="document.getElementById('modalListaPreciosMP').classList.add('hidden')" class="px-4 py-2 bg-salvia text-huesoClaro font-extrabold rounded-xl shadow">Listo</button>
       </div>
     </div>
   </div>
@@ -1666,6 +1712,120 @@
       renderizarTodo();
     }
 
+    function abrirModalListaPreciosMP() {
+      state.filtroPreciosMP = state.filtroPreciosMP || "TODOS";
+      renderizarListaPreciosMP();
+      document.getElementById("modalListaPreciosMP").classList.remove("hidden");
+    }
+
+    function setFiltroPreciosMP(f) {
+      state.filtroPreciosMP = f;
+      renderizarListaPreciosMP();
+    }
+
+    function renderizarListaPreciosMP() {
+      const q = (document.getElementById("buscarPrecioMPInput")?.value || "").toLowerCase();
+      const filtro = state.filtroPreciosMP || "TODOS";
+      const cont = document.getElementById("contenedorFilasPreciosMP");
+      if (!cont) return;
+
+      const items = state.inventario.filter(it => {
+        if (it.categoriaCodigo !== "MATERIA_PRIMA" && it.categoriaCodigo !== "EMPAQUE") return false;
+        if (filtro !== "TODOS" && it.categoriaCodigo !== filtro) return false;
+        if (q && !it.nombre.toLowerCase().includes(q) && !(it.presentacionTipo || "").toLowerCase().includes(q)) return false;
+        return true;
+      });
+
+      cont.innerHTML = items.map(it => {
+        const tam = Math.max(0.01, parseFloat(it.empaqueTam || 1));
+        const precioUnit = parseFloat(it.precioPorUnidad || (it.costoPorGramoUSD ? it.costoPorGramoUSD * 1000 : 1.0));
+        const precioPresentacion = +(precioUnit * tam).toFixed(2);
+        const esKg = (it.unidadMedida || "").toUpperCase().includes("KG");
+        const costoGr = esKg ? (precioUnit / 1000.0) : precioUnit;
+
+        return `
+          <div class="p-2.5 bg-slate-50 rounded-2xl border border-slate-200 grid grid-cols-1 sm:grid-cols-12 gap-2 items-center text-xs">
+            <div class="sm:col-span-4">
+              <span class="px-2 py-0.5 rounded bg-hueso text-choco text-[10px] font-extrabold">${it.categoriaCodigo === 'EMPAQUE' ? '🏷️ Empaque' : '🌾 Materia Prima'}</span>
+              <h4 class="font-extrabold text-choco mt-0.5">${it.nombre}</h4>
+            </div>
+            <div class="sm:col-span-3 flex items-center gap-1.5 bg-white p-1.5 rounded-xl border border-slate-200">
+              <span class="text-[10px] font-bold text-slate-500">${it.presentacionTipo || 'Saco'}:</span>
+              <input type="number" value="${tam}" step="0.5"
+                onchange="actualizarPrecioMaterialEnLista('${it.id}', 'TAMANO', this.value)"
+                class="w-16 p-1 border border-huesoBorde rounded text-center font-extrabold text-choco">
+              <span class="font-bold text-choco">${it.unidadMedida}</span>
+            </div>
+            <div class="sm:col-span-3 flex items-center gap-1.5 bg-hueso/50 p-1.5 rounded-xl border border-huesoBorde">
+              <span class="text-[10px] font-extrabold text-choco">Precio ${it.presentacionTipo || 'Saco'} ($):</span>
+              <input type="number" value="${precioPresentacion}" step="0.1"
+                onchange="actualizarPrecioMaterialEnLista('${it.id}', 'PRECIO_SACO', this.value)"
+                class="w-20 p-1 bg-white border-2 border-choco rounded text-center font-extrabold text-choco">
+            </div>
+            <div class="sm:col-span-2 text-right">
+              <span class="block font-extrabold text-salvia">$${precioUnit.toFixed(3)} / ${it.unidadMedida}</span>
+              <span class="block text-[10px] text-slate-500">${esKg ? '$' + costoGr.toFixed(5) + ' / gr' : 'Bs. ' + (precioUnit * state.tasaUsdBcv).toFixed(2)}</span>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function actualizarPrecioMaterialEnLista(idMat, campo, valorStr) {
+      const it = state.inventario.find(x => x.id === idMat);
+      if (!it) return;
+      const val = Math.max(0.0001, parseFloat(valorStr || 0));
+      const tamActual = Math.max(0.01, parseFloat(it.empaqueTam || 1));
+      const precioUnitActual = parseFloat(it.precioPorUnidad || 1);
+
+      if (campo === "TAMANO") {
+        it.empaqueTam = val;
+      } else if (campo === "PRECIO_SACO") {
+        it.precioPorUnidad = +(val / tamActual).toFixed(5);
+      }
+
+      const esKg = (it.unidadMedida || "").toUpperCase().includes("KG");
+      it.costoPorGramoUSD = esKg ? (it.precioPorUnidad / 1000.0) : it.precioPorUnidad;
+
+      recalcularCostosRecetasDesdePreciosMP();
+      renderizarListaPreciosMP();
+      renderizarTodo();
+    }
+
+    function recalcularCostosRecetasDesdePreciosMP() {
+      state.productos.forEach(p => {
+        if (Array.isArray(p.ingredientes) && p.ingredientes.length > 0) {
+          const harinaKg = Math.max(0.1, parseFloat(p.harinaBaseKg || 10));
+          const porcionGr = Math.max(1, parseFloat(p.pesoPorPorcionGr || 55.56));
+          let masaTotalGr = 0;
+          let costoTotalMezclaUSD = 0;
+          p.ingredientes.forEach(ing => {
+            const mp = state.inventario.find(x => x.id === ing.materiaPrimaId || x.nombre === ing.nombre);
+            if (mp && mp.costoPorGramoUSD) {
+              ing.costoPorGramoUSD = mp.costoPorGramoUSD;
+            }
+            const cantGr = ((harinaKg * parseFloat(ing.porcentajePanadero || 0)) / 100.0) * 1000.0;
+            masaTotalGr += cantGr;
+            costoTotalMezclaUSD += cantGr * parseFloat(ing.costoPorGramoUSD || 0.001);
+          });
+          const totalUnidades = Math.max(1, masaTotalGr / porcionGr);
+          p.costoUnidadPanRecienHechoUSD = +(costoTotalMezclaUSD / totalUnidades).toFixed(4);
+          p.costoMateriaPrima = +(p.costoUnidadPanRecienHechoUSD * (p.unidadesPorPaquete || 1)).toFixed(4);
+        }
+        if (!p.sinEmpaque && Array.isArray(p.elementosEmpaque)) {
+          let sumaEmp = 0;
+          p.elementosEmpaque.forEach(e => {
+            const empInv = state.inventario.find(x => x.id === e.itemId || x.nombre === e.nombre);
+            if (empInv && empInv.precioPorUnidad) {
+              e.costoUnitarioUSD = parseFloat(empInv.precioPorUnidad);
+            }
+            sumaEmp += (parseInt(e.cantidadPorPaquete || 1) * parseFloat(e.costoUnitarioUSD || 0.005));
+          });
+          p.costoEmpaqueUSD = +sumaEmp.toFixed(4);
+        }
+      });
+    }
+
     function actualizarColchonInflacionDirecto(val) {
       const pct = parseFloat(val);
       if (isNaN(pct)) return;
@@ -1675,6 +1835,14 @@
         state.sobrecostosProteccion[0].porcentaje = pct;
         state.sobrecostosProteccion[0].activo = true;
       }
+      recalcularFinanzas();
+    }
+
+    function fijarColchonProductoIndividual(idx, valStr) {
+      const p = state.productos[idx];
+      if (!p) return;
+      const v = parseFloat(valStr);
+      p.colchonInflacionPersonalizadoPct = isNaN(v) ? null : v;
       recalcularFinanzas();
     }
 
@@ -1758,7 +1926,10 @@
         const costoPanesEnPaquete = costoUnidPan * undsPaq;
         const costoKitEmpaque = p.sinEmpaque ? 0.0 : parseFloat(p.costoEmpaqueUSD || 0.02);
         const costoBasePaquete = costoPanesEnPaquete + costoKitEmpaque + cuotaFijaPaq;
-        const montoColchonUSD = costoBasePaquete * (totalPctSobreprecio / 100.0);
+        const pctColchonEfectivo = (typeof p.colchonInflacionPersonalizadoPct === "number")
+          ? p.colchonInflacionPersonalizadoPct
+          : totalPctSobreprecio;
+        const montoColchonUSD = costoBasePaquete * (pctColchonEfectivo / 100.0);
         const costoProtegidoPaq = costoBasePaquete + montoColchonUSD;
         p._ultimoCostoProtegidoPaq = costoProtegidoPaq;
 
@@ -1794,8 +1965,13 @@
                 <span class="font-bold text-slate-700">$${(costoKitEmpaque + cuotaFijaPaq).toFixed(3)}</span>
               </div>
               <div class="bg-hueso/50 rounded px-1">
-                <span class="block text-[9px] text-caramelo uppercase font-extrabold">+Colchón (${totalPctSobreprecio.toFixed(0)}%)</span>
-                <span class="font-extrabold text-choco">+$${montoColchonUSD.toFixed(3)}</span>
+                <span class="block text-[9px] text-caramelo uppercase font-extrabold">Colchón (%)</span>
+                <div class="flex items-center justify-center gap-0.5">
+                  <input type="number" value="${pctColchonEfectivo.toFixed(1)}" step="0.5"
+                    onchange="fijarColchonProductoIndividual(${idx}, this.value)"
+                    class="w-12 p-0.5 bg-white border border-caramelo rounded text-center font-extrabold text-choco text-[11px]">
+                  <span class="text-[10px] font-bold text-choco">%</span>
+                </div>
               </div>
               <div class="bg-hueso rounded px-1">
                 <span class="block text-[9px] text-choco uppercase font-extrabold">Costo Empaque</span>
