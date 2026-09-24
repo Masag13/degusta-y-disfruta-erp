@@ -206,21 +206,23 @@
   <main class="max-w-7xl mx-auto p-3 sm:p-5 space-y-5 no-print">
 
     <!-- =======================================================================
-         1. RECETAS
+         1. RECETAS (SEPARACIÓN: 1. UNIDADES DE HORNO vs 2. PAQUETES PARA VENTA)
          ======================================================================= -->
     <section id="tab-recetas" class="tab-content active space-y-4">
       <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
-        <div class="flex items-center gap-3">
-          <h2 class="text-base font-extrabold text-choco">Recetas y Fórmulas</h2>
-          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-hueso text-choco">Base 100% Harina + Empaque</span>
+        <div class="flex flex-wrap items-center gap-2">
+          <h2 class="text-base font-extrabold text-choco mr-2">Recetas y Empaques</h2>
+          <button onclick="setNivelVistaReceta('AMBOS')" id="btnNivelRec-AMBOS" class="px-3 py-1.5 rounded-xl text-xs font-extrabold bg-choco text-hueso">🔗 Vista Completa</button>
+          <button onclick="setNivelVistaReceta('SOLO_PAN')" id="btnNivelRec-SOLO_PAN" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-hueso text-choco">🥖 1. Productos Terminados (Por Unidad)</button>
+          <button onclick="setNivelVistaReceta('SOLO_EMPAQUE')" id="btnNivelRec-SOLO_EMPAQUE" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-hueso text-choco">🛍️ 2. Productos para la Venta (Empaques)</button>
         </div>
-        <button onclick="abrirModalFormulaDyD(null)" class="bg-choco hover:bg-chocoDark text-hueso font-extrabold py-2.5 px-4 rounded-xl text-xs shadow">
-          ➕ Nueva Receta
+        <button onclick="abrirModalFormulaDyD(null)" class="bg-choco hover:bg-chocoDark text-hueso font-extrabold py-2 px-4 rounded-xl text-xs shadow">
+          ➕ Nuevo Producto / Empaque
         </button>
       </div>
 
       <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row gap-2 items-center justify-between">
-        <input type="text" id="buscarRecetaInput" oninput="renderizarRecetas()" placeholder="Buscar receta o producto..."
+        <input type="text" id="buscarRecetaInput" oninput="renderizarRecetas()" placeholder="Buscar pan o paquete..."
           class="w-full sm:flex-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold">
         <div class="flex gap-1.5 w-full sm:w-auto overflow-x-auto">
           <button onclick="setFiltroReceta('TODOS')" id="fRec-TODOS" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-choco text-hueso shrink-0">Todos (39)</button>
@@ -302,21 +304,21 @@
 
 
     <!-- =======================================================================
-         3. FINANZAS
+         3. FINANZAS (PRECIO DE VENTA POR EMPAQUE + COLCHÓN INFLACIÓN EDITABLE)
          ======================================================================= -->
     <section id="tab-finanzas" class="tab-content space-y-4">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200">
-          <span class="text-[10px] font-extrabold uppercase text-salvia">Ventas del Mes</span>
-          <div id="kpiUnidadesVendidasMes" class="text-xl font-extrabold text-salvia mt-0.5">18,450 und</div>
+          <span class="text-[10px] font-extrabold uppercase text-salvia">Paquetes Vendidos Mes</span>
+          <div id="kpiUnidadesVendidasMes" class="text-xl font-extrabold text-salvia mt-0.5">18,450 paq</div>
           <label class="flex items-center gap-1.5 text-[11px] font-bold text-slate-600 mt-1.5 cursor-pointer">
             <input type="checkbox" id="checkUsarVentasMesComoBase" checked onchange="recalcularFinanzas()" class="rounded">
-            <span>Usar como base fija</span>
+            <span>Usar ventas del mes</span>
           </label>
         </div>
 
         <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200">
-          <span class="text-[10px] font-extrabold uppercase text-slate-500">Base Mensual (Und)</span>
+          <span class="text-[10px] font-extrabold uppercase text-slate-500">Meta Mensual (Paquetes)</span>
           <input type="number" id="inputBaseAbsorcionMes" value="18450" oninput="recalcularFinanzas()"
             class="w-full mt-1 px-2.5 py-1 border border-huesoBorde rounded-xl font-extrabold text-base text-choco bg-hueso/40">
         </div>
@@ -324,13 +326,18 @@
         <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200">
           <span class="text-[10px] font-extrabold uppercase text-slate-500">Gastos Fijos Mes</span>
           <div id="kpiSumaCostosFijosMes" class="text-xl font-extrabold text-choco mt-0.5">$850.00</div>
-          <div id="kpiCuotaFijaPorUnidad" class="text-[11px] font-bold text-caramelo mt-0.5">Fijo/und: $0.0461</div>
+          <div id="kpiCuotaFijaPorUnidad" class="text-[11px] font-bold text-caramelo mt-0.5">Fijo/paquete: $0.0461</div>
         </div>
 
-        <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200">
-          <span class="text-[10px] font-extrabold uppercase text-caramelo">Ajuste / Inflación</span>
-          <div id="kpiTotalSobrecostoPct" class="text-xl font-extrabold text-choco mt-0.5">+14.0%</div>
-          <span class="text-[10px] text-slate-500 block mt-0.5">Aplicado sobre el costo</span>
+        <div class="bg-white p-3.5 rounded-2xl shadow-sm border-2 border-caramelo">
+          <span class="text-[10px] font-extrabold uppercase text-caramelo">🛡️ Colchón por Inflación (%)</span>
+          <div class="flex items-center gap-1.5 mt-1">
+            <input type="number" id="inputColchonInflacionDirecto" value="10" step="0.5" oninput="actualizarColchonInflacionDirecto(this.value)"
+              class="w-20 px-2 py-1 border-2 border-choco rounded-xl font-extrabold text-base text-choco bg-hueso/60 text-center">
+            <span class="font-extrabold text-sm text-choco">%</span>
+            <span id="kpiTotalSobrecostoPct" class="ml-auto text-xs font-extrabold px-2 py-1 rounded-lg bg-hueso text-choco">Total: +14.0%</span>
+          </div>
+          <span class="text-[10px] text-slate-500 block mt-1">Editable en vivo · Suma otros ajustes abajo</span>
         </div>
       </div>
 
@@ -343,26 +350,29 @@
         <div id="contenedorCostosFijosCRUD" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2"></div>
       </div>
 
-      <!-- Ajustes de Costo -->
+      <!-- Ajustes de Costo / Colchón por Inflación -->
       <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200 space-y-2.5">
         <div class="flex items-center justify-between">
-          <h3 class="text-sm font-extrabold text-choco">2. Ajustes de Costo / Protección Inflacionaria (%)</h3>
-          <button onclick="agregarSobreprecioInflacion()" class="px-3 py-1.5 bg-caramelo text-huesoClaro rounded-xl text-xs font-extrabold">+ Agregar %</button>
+          <h3 class="text-sm font-extrabold text-choco">2. Variables de Colchón por Inflación y Merma (%)</h3>
+          <button onclick="agregarSobreprecioInflacion()" class="px-3 py-1.5 bg-caramelo text-huesoClaro rounded-xl text-xs font-extrabold">+ Nueva Variable %</button>
         </div>
         <div id="contenedorSobrepreciosCRUD" class="grid grid-cols-1 md:grid-cols-3 gap-2"></div>
       </div>
 
-      <!-- Precios y Márgenes -->
-      <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200 space-y-2.5">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <h3 class="text-sm font-extrabold text-choco">3. Costos Unitarios y Precios de Venta</h3>
+      <!-- Precios de Venta por Empaque Comercial -->
+      <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-huesoBorde pb-2.5">
+          <div>
+            <h3 class="text-sm font-extrabold text-choco">3. Precio de Venta por Empaque Comercial (Panes + Bolsa + Precinto + Etiqueta)</h3>
+            <p class="text-[11px] font-semibold text-slate-500">El pan por unidad solo aporta su costo; el Precio de Venta se fija sobre el paquete empacado.</p>
+          </div>
           <div class="flex items-center gap-2">
-            <span class="text-xs font-bold">Margen (%):</span>
+            <span class="text-xs font-bold">Margen global (%):</span>
             <input type="number" id="inputMargenGlobalFin" value="45" class="w-14 px-2 py-1 border border-slate-300 rounded-lg text-xs font-extrabold text-center">
-            <button onclick="aplicarMargenGlobalFin()" class="px-3 py-1.5 bg-choco text-hueso rounded-lg text-xs font-bold">Aplicar a Todos</button>
+            <button onclick="aplicarMargenGlobalFin()" class="px-3 py-1.5 bg-choco text-hueso rounded-lg text-xs font-bold">Aplicar a Empaques</button>
           </div>
         </div>
-        <div id="tablaFinanzasProductos" class="space-y-2"></div>
+        <div id="tablaFinanzasProductos" class="space-y-2.5"></div>
       </div>
     </section>
 
@@ -1107,14 +1117,37 @@
       if (window.lucide) lucide.createIcons();
     }
 
-    function setFiltroReceta(f) {
-      state.filtroReceta = f;
+    function setNivelVistaReceta(nivel) {
+      state.nivelVistaReceta = nivel;
+      ["AMBOS", "SOLO_PAN", "SOLO_EMPAQUE"].forEach(k => {
+        const btn = document.getElementById("btnNivelRec-" + k);
+        if (btn) {
+          btn.className = (k === nivel)
+            ? "px-3 py-1.5 rounded-xl text-xs font-extrabold bg-choco text-hueso shadow"
+            : "px-3 py-1.5 rounded-xl text-xs font-bold bg-hueso text-choco";
+        }
+      });
       renderizarRecetas();
     }
+
+    function setFiltroReceta(f) {
+      state.filtroReceta = f;
+      ["TODOS", "PRODUCTO_TERMINADO", "REVENTA_MAKILA"].forEach(k => {
+        const btn = document.getElementById("fRec-" + k);
+        if (btn) {
+          btn.className = (k === f)
+            ? "px-3 py-1.5 rounded-xl text-xs font-bold bg-choco text-hueso shrink-0"
+            : "px-3 py-1.5 rounded-xl text-xs font-semibold bg-hueso text-choco shrink-0";
+        }
+      });
+      renderizarRecetas();
+    }
+
     function renderizarRecetas() {
       const q = (document.getElementById("buscarRecetaInput")?.value || "").toLowerCase();
       const cont = document.getElementById("gridRecetasContainer");
       if (!cont) return;
+      const nivel = state.nivelVistaReceta || "AMBOS";
 
       const lista = state.productos.filter(p => {
         if (state.filtroReceta !== "TODOS" && p.tipoProducto !== state.filtroReceta) return false;
@@ -1125,11 +1158,77 @@
       cont.innerHTML = lista.map(p => {
         const costoUnidPan = parseFloat(p.costoUnidadPanRecienHechoUSD || p.costoMateriaPrima || 0.08);
         const undsPaq = parseInt(p.unidadesPorPaquete || 1);
+        const costoPanesEnBolsa = costoUnidPan * undsPaq;
         const costoEmp = p.sinEmpaque ? 0.0 : parseFloat(p.costoEmpaqueUSD || 0.02);
-        const costoPaqueteListo = (costoUnidPan * undsPaq) + costoEmp;
+        const costoPaqueteListo = costoPanesEnBolsa + costoEmp;
         const descEmpaque = p.sinEmpaque
           ? `Sin empaque ($0.00)`
           : (p.elementosEmpaque || []).map(e => `${e.cantidadPorPaquete}x ${e.nombre.split(' ')[0]}`).join(" + ");
+        const nombreUnidadBase = p.nombre.replace(/PAQUETE\s+/i, "").replace(/X\s*\d+\s*UND/i, "").trim() + " (Unidad)";
+
+        if (nivel === "SOLO_PAN") {
+          return `
+            <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-200 flex flex-col justify-between space-y-2.5">
+              <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                  <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-hueso text-choco">🥖 1. Producto Terminado (Horno)</span>
+                  <span class="text-[11px] font-bold text-slate-400">${p.id}</span>
+                </div>
+                <h4 class="font-extrabold text-sm text-choco">${nombreUnidadBase}</h4>
+                <div class="p-2.5 rounded-xl bg-hueso/50 border border-huesoBorde flex justify-between items-center text-xs">
+                  <div>
+                    <span class="block text-[10px] font-bold text-slate-600">Peso unidad: <strong>${p.pesoPorPorcionGr}g</strong></span>
+                    <span class="block text-[10px] text-slate-500">Pesada 36 cortes: ${p.pesada36CortesGr}g</span>
+                  </div>
+                  <div class="text-right">
+                    <span class="block text-[9px] font-extrabold uppercase text-choco">Costo 1 Unidad</span>
+                    <span class="text-base font-extrabold text-choco">$${costoUnidPan.toFixed(4)}</span>
+                    <span class="block text-[10px] font-bold text-slate-600">Bs. ${(costoUnidPan * state.tasaUsdBcv).toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+              <button onclick="abrirModalFormulaDyD('${p.id}')" class="w-full py-2 bg-choco hover:bg-chocoDark text-hueso font-extrabold rounded-xl text-xs">
+                ✏️ Editar Fórmula de la Unidad
+              </button>
+            </div>
+          `;
+        }
+
+        if (nivel === "SOLO_EMPAQUE") {
+          return `
+            <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-200 flex flex-col justify-between space-y-2.5">
+              <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                  <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-salvia text-huesoClaro">🛍️ 2. Empaque para la Venta</span>
+                  <span class="text-xs font-extrabold text-salvia">PVP: $${parseFloat(p.precioVentaUSD || 1.50).toFixed(2)}</span>
+                </div>
+                <h4 class="font-extrabold text-sm text-choco">${p.nombre}</h4>
+                <div class="p-2.5 rounded-xl bg-hueso/50 border border-huesoBorde space-y-1 text-xs">
+                  <div class="flex justify-between">
+                    <span class="text-slate-600">🥖 Contenido (${undsPaq} uds × $${costoUnidPan.toFixed(3)}):</span>
+                    <strong class="text-choco">$${costoPanesEnBolsa.toFixed(3)}</strong>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-600 truncate mr-2">🏷️ Empaque (${descEmpaque}):</span>
+                    <strong class="text-choco">$${costoEmp.toFixed(3)}</strong>
+                  </div>
+                  <div class="flex justify-between border-t border-huesoBorde pt-1 font-extrabold text-choco">
+                    <span>Costo Directo del Empaque:</span>
+                    <span>$${costoPaqueteListo.toFixed(3)} / paq</span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex gap-1.5">
+                <button onclick="abrirModalFormulaDyD('${p.id}')" class="flex-1 py-2 bg-choco hover:bg-chocoDark text-hueso font-extrabold rounded-xl text-xs">
+                  ✏️ Armar Empaque
+                </button>
+                <button onclick="cambiarPestana('finanzas')" class="px-3 py-2 bg-hueso text-choco font-extrabold rounded-xl text-xs">
+                  💲 Precio Venta
+                </button>
+              </div>
+            </div>
+          `;
+        }
 
         return `
           <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-200 flex flex-col justify-between space-y-2.5">
@@ -1138,26 +1237,26 @@
                 <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-hueso text-choco">
                   ⏱️ ${p.subtipoMasa}
                 </span>
-                <span class="text-[11px] font-bold text-slate-400">${p.id}</span>
+                <span class="text-xs font-extrabold text-salvia">PVP Empaque: $${parseFloat(p.precioVentaUSD || 1.50).toFixed(2)}</span>
               </div>
               <h4 class="font-extrabold text-sm text-choco">${p.nombre}</h4>
 
               <div class="grid grid-cols-2 gap-2 text-xs">
-                <div class="p-2 rounded-xl bg-hueso/50 border border-huesoBorde">
-                  <span class="block text-[9px] font-extrabold uppercase text-choco">🥖 1. Unidad</span>
+                <div class="p-2 rounded-xl bg-hueso/40 border border-huesoBorde">
+                  <span class="block text-[9px] font-extrabold uppercase text-choco">🥖 1. Pan Suelto (1u)</span>
                   <span class="font-extrabold text-choco block">$${costoUnidPan.toFixed(3)} / und</span>
                   <span class="text-[10px] text-slate-600">${p.pesoPorPorcionGr}g · 36c: ${p.pesada36CortesGr}g</span>
                 </div>
-                <div class="p-2 rounded-xl bg-hueso/50 border border-huesoBorde">
-                  <span class="block text-[9px] font-extrabold uppercase text-choco">📦 2. Paquete (${undsPaq}u)</span>
+                <div class="p-2 rounded-xl bg-hueso/70 border border-choco/30">
+                  <span class="block text-[9px] font-extrabold uppercase text-choco">🛍️ 2. Empaque (${undsPaq}u)</span>
                   <span class="font-extrabold text-choco block">$${costoPaqueteListo.toFixed(3)} / paq</span>
-                  <span class="text-[10px] text-slate-600 block truncate">${descEmpaque}</span>
+                  <span class="text-[10px] text-slate-600 block truncate">${undsPaq} panes + ${descEmpaque}</span>
                 </div>
               </div>
             </div>
 
             <button onclick="abrirModalFormulaDyD('${p.id}')" class="w-full py-2 bg-choco hover:bg-chocoDark text-hueso font-extrabold rounded-xl text-xs">
-              ✏️ Editar Receta y Empaque
+              ✏️ Editar Unidad y Empaque
             </button>
           </div>
         `;
@@ -1567,18 +1666,51 @@
       renderizarTodo();
     }
 
+    function actualizarColchonInflacionDirecto(val) {
+      const pct = parseFloat(val);
+      if (isNaN(pct)) return;
+      if (state.sobrecostosProteccion.length === 0) {
+        state.sobrecostosProteccion.push({ id: "sp1", nombre: "Colchón por Inflación / Reposición", porcentaje: pct, activo: true });
+      } else {
+        state.sobrecostosProteccion[0].porcentaje = pct;
+        state.sobrecostosProteccion[0].activo = true;
+      }
+      recalcularFinanzas();
+    }
+
+    function fijarPrecioVentaEmpaqueManual(idx, nuevoPrecioStr) {
+      const p = state.productos[idx];
+      if (!p) return;
+      const pvp = parseFloat(nuevoPrecioStr);
+      if (isNaN(pvp) || pvp <= 0) return;
+      p.precioVentaManualActivo = true;
+      p.precioVentaUSD = +pvp.toFixed(2);
+      if (p._ultimoCostoProtegidoPaq && p._ultimoCostoProtegidoPaq > 0) {
+        p.margenGananciaPct = +(((pvp / p._ultimoCostoProtegidoPaq) - 1) * 100).toFixed(1);
+      }
+      recalcularFinanzas();
+    }
+
+    function fijarMargenEmpaque(idx, nuevoMargenStr) {
+      const p = state.productos[idx];
+      if (!p) return;
+      p.precioVentaManualActivo = false;
+      p.margenGananciaPct = parseFloat(nuevoMargenStr || 0);
+      recalcularFinanzas();
+    }
+
     function recalcularFinanzas() {
       const vendidasPedidos = state.pedidos.reduce((acc, ped) => acc + ped.items.reduce((s, it) => s + (parseInt(it.cantidad)||0), 0), 18400);
-      document.getElementById("kpiUnidadesVendidasMes").innerText = vendidasPedidos.toLocaleString() + " und";
+      document.getElementById("kpiUnidadesVendidasMes").innerText = vendidasPedidos.toLocaleString() + " paq";
       if (document.getElementById("checkUsarVentasMesComoBase").checked) {
         document.getElementById("inputBaseAbsorcionMes").value = vendidasPedidos;
       }
       const baseAbsorcion = Math.max(1, parseFloat(document.getElementById("inputBaseAbsorcionMes").value || vendidasPedidos));
       const sumaFijos = state.costosFijosMensuales.reduce((a, b) => a + b.montoUSD, 0);
-      const cuotaFijaUnit = sumaFijos / baseAbsorcion;
+      const cuotaFijaPaq = sumaFijos / baseAbsorcion;
 
       document.getElementById("kpiSumaCostosFijosMes").innerText = "$" + sumaFijos.toFixed(2);
-      document.getElementById("kpiCuotaFijaPorUnidad").innerText = `Fijo/und: $${cuotaFijaUnit.toFixed(4)}`;
+      document.getElementById("kpiCuotaFijaPorUnidad").innerText = `Fijo/paquete: $${cuotaFijaPaq.toFixed(4)}`;
 
       document.getElementById("contenedorCostosFijosCRUD").innerHTML = state.costosFijosMensuales.map((cf, idx) => `
         <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between gap-2 text-xs">
@@ -1593,16 +1725,27 @@
         </div>
       `).join("");
 
+      if (state.sobrecostosProteccion.length > 0) {
+        const inpColchon = document.getElementById("inputColchonInflacionDirecto");
+        if (inpColchon && document.activeElement !== inpColchon) {
+          inpColchon.value = state.sobrecostosProteccion[0].porcentaje;
+        }
+      }
+
       const totalPctSobreprecio = state.sobrecostosProteccion.filter(s => s.activo).reduce((a, b) => a + b.porcentaje, 0);
-      document.getElementById("kpiTotalSobrecostoPct").innerText = (totalPctSobreprecio >= 0 ? "+" : "") + totalPctSobreprecio.toFixed(1) + "%";
+      document.getElementById("kpiTotalSobrecostoPct").innerText = "Total: " + (totalPctSobreprecio >= 0 ? "+" : "") + totalPctSobreprecio.toFixed(1) + "%";
 
       document.getElementById("contenedorSobrepreciosCRUD").innerHTML = state.sobrecostosProteccion.map((sp, idx) => `
         <div class="p-2.5 bg-hueso/50 rounded-xl border border-huesoBorde flex items-center justify-between gap-2 text-xs">
-          <label class="flex items-center gap-2 cursor-pointer min-w-0">
+          <label class="flex items-center gap-2 cursor-pointer min-w-0 flex-1">
             <input type="checkbox" ${sp.activo ? 'checked' : ''} onchange="state.sobrecostosProteccion[${idx}].activo=this.checked;recalcularFinanzas()">
-            <span class="font-extrabold text-choco truncate">${sp.nombre} (${sp.porcentaje >= 0 ? '+' : ''}${sp.porcentaje}%)</span>
+            <span class="font-extrabold text-choco truncate">${sp.nombre}</span>
           </label>
-          <div class="flex gap-1 shrink-0">
+          <div class="flex items-center gap-1 shrink-0">
+            <input type="number" value="${sp.porcentaje}" step="0.5"
+              oninput="state.sobrecostosProteccion[${idx}].porcentaje=parseFloat(this.value||0);recalcularFinanzas()"
+              class="w-14 px-1.5 py-1 bg-white border border-choco/40 rounded-lg font-extrabold text-center text-choco">
+            <span class="font-bold text-choco">%</span>
             <button onclick="editarSobreprecioInflacion(${idx})" class="px-2 py-1 bg-white border border-huesoBorde rounded font-bold">✏️</button>
             <button onclick="state.sobrecostosProteccion.splice(${idx},1);recalcularFinanzas()" class="px-2 py-1 bg-red-100 text-red-700 rounded font-bold">🗑️</button>
           </div>
@@ -1610,32 +1753,74 @@
       `).join("");
 
       document.getElementById("tablaFinanzasProductos").innerHTML = state.productos.slice(0, 25).map((p, idx) => {
-        const cMP = parseFloat(p.costoMateriaPrima || 0.08);
-        const cEmp = p.sinEmpaque ? 0.0 : parseFloat(p.costoEmpaqueUSD || 0.018);
-        const costoBaseUnit = cMP + cEmp + cuotaFijaUnit;
-        const costoProtegidoInflacion = costoBaseUnit * (1 + (totalPctSobreprecio / 100.0));
-        const margen = parseFloat(p.margenGananciaPct || 45);
-        const pvpUSD = costoProtegidoInflacion * (1 + (margen / 100.0));
+        const costoUnidPan = parseFloat(p.costoUnidadPanRecienHechoUSD || p.costoMateriaPrima || 0.08);
+        const undsPaq = parseInt(p.unidadesPorPaquete || 1);
+        const costoPanesEnPaquete = costoUnidPan * undsPaq;
+        const costoKitEmpaque = p.sinEmpaque ? 0.0 : parseFloat(p.costoEmpaqueUSD || 0.02);
+        const costoBasePaquete = costoPanesEnPaquete + costoKitEmpaque + cuotaFijaPaq;
+        const montoColchonUSD = costoBasePaquete * (totalPctSobreprecio / 100.0);
+        const costoProtegidoPaq = costoBasePaquete + montoColchonUSD;
+        p._ultimoCostoProtegidoPaq = costoProtegidoPaq;
+
+        let margen = parseFloat(p.margenGananciaPct || 45);
+        let pvpUSD = p.precioVentaManualActivo
+          ? parseFloat(p.precioVentaUSD || (costoProtegidoPaq * (1 + margen / 100.0)))
+          : (costoProtegidoPaq * (1 + (margen / 100.0)));
+
         p.precioVentaUSD = +pvpUSD.toFixed(2);
+        const gananciaNetaPaq = pvpUSD - costoProtegidoPaq;
+        const margenRealPct = costoProtegidoPaq > 0 ? ((gananciaNetaPaq / costoProtegidoPaq) * 100) : 0;
         const pvpBs = pvpUSD * state.tasaUsdBcv;
         const pvpEur = (pvpBs / state.tasaEurBcv);
+        const descEmp = p.sinEmpaque
+          ? "Sin empaque"
+          : (p.elementosEmpaque || []).map(e => `${e.cantidadPorPaquete}x ${e.nombre.split(' ')[0]}`).join(" + ");
 
         return `
-          <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 grid grid-cols-1 lg:grid-cols-12 gap-2 items-center text-xs">
-            <div class="lg:col-span-4">
-              <h4 class="font-extrabold text-choco">${p.nombre}</h4>
+          <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200 grid grid-cols-1 lg:grid-cols-12 gap-2.5 items-center text-xs">
+            <div class="lg:col-span-3 space-y-0.5">
+              <span class="px-2 py-0.5 rounded bg-hueso text-choco text-[10px] font-extrabold">🛍️ Empaque (${undsPaq} uds)</span>
+              <h4 class="font-extrabold text-choco text-xs sm:text-sm">${p.nombre}</h4>
+              <p class="text-[10px] text-slate-500 font-semibold">🥖 1 Pan suelto: <strong>$${costoUnidPan.toFixed(3)}</strong> · 🏷️ ${descEmp}</p>
             </div>
-            <div class="lg:col-span-5 grid grid-cols-3 gap-1.5 text-center bg-white p-1.5 rounded-lg border border-slate-200">
-              <div><span class="block text-[9px] text-slate-500 uppercase font-bold">Costo Base</span><span class="font-bold">$${costoBaseUnit.toFixed(3)}</span></div>
-              <div class="bg-hueso/50 rounded"><span class="block text-[9px] text-choco uppercase font-bold">Con Ajuste</span><span class="font-extrabold text-choco">$${costoProtegidoInflacion.toFixed(3)}</span></div>
+
+            <div class="lg:col-span-5 grid grid-cols-4 gap-1 text-center bg-white p-2 rounded-xl border border-slate-200">
               <div>
-                <span class="block text-[9px] text-salvia uppercase font-bold">% Margen</span>
-                <input type="number" value="${margen}" oninput="state.productos[${idx}].margenGananciaPct=parseFloat(this.value||0);recalcularFinanzas()" class="w-14 border border-huesoBorde rounded text-center font-extrabold">
+                <span class="block text-[9px] text-slate-500 uppercase font-bold">Panes (${undsPaq}u)</span>
+                <span class="font-extrabold text-choco">$${costoPanesEnPaquete.toFixed(3)}</span>
+              </div>
+              <div>
+                <span class="block text-[9px] text-slate-500 uppercase font-bold">Empaque+Fijo</span>
+                <span class="font-bold text-slate-700">$${(costoKitEmpaque + cuotaFijaPaq).toFixed(3)}</span>
+              </div>
+              <div class="bg-hueso/50 rounded px-1">
+                <span class="block text-[9px] text-caramelo uppercase font-extrabold">+Colchón (${totalPctSobreprecio.toFixed(0)}%)</span>
+                <span class="font-extrabold text-choco">+$${montoColchonUSD.toFixed(3)}</span>
+              </div>
+              <div class="bg-hueso rounded px-1">
+                <span class="block text-[9px] text-choco uppercase font-extrabold">Costo Empaque</span>
+                <span class="font-extrabold text-choco">$${costoProtegidoPaq.toFixed(3)}</span>
               </div>
             </div>
-            <div class="lg:col-span-3 text-right bg-hueso/60 p-2 rounded-lg border border-huesoBorde">
-              <span class="font-extrabold text-sm text-choco">$${pvpUSD.toFixed(2)}</span>
-              <span class="block text-[10px] font-bold text-slate-600">€${pvpEur.toFixed(2)} · Bs. ${pvpBs.toFixed(2)}</span>
+
+            <div class="lg:col-span-4 grid grid-cols-3 gap-1.5 items-center bg-hueso/60 p-2 rounded-xl border border-huesoBorde">
+              <div class="text-center">
+                <span class="block text-[9px] text-salvia uppercase font-extrabold">% Margen</span>
+                <input type="number" value="${margenRealPct.toFixed(1)}" step="1"
+                  onchange="fijarMargenEmpaque(${idx}, this.value)"
+                  class="w-16 p-1 bg-white border border-huesoBorde rounded-lg text-center font-extrabold text-choco">
+              </div>
+              <div class="text-center">
+                <span class="block text-[9px] text-choco uppercase font-extrabold">PVP Empaque ($)</span>
+                <input type="number" value="${pvpUSD.toFixed(2)}" step="0.05"
+                  onchange="fijarPrecioVentaEmpaqueManual(${idx}, this.value)"
+                  class="w-18 p-1 bg-white border-2 border-choco rounded-lg text-center font-extrabold text-choco">
+              </div>
+              <div class="text-right">
+                <span class="block text-[10px] font-extrabold text-salvia">Ganancia: +$${gananciaNetaPaq.toFixed(2)}</span>
+                <span class="block text-[10px] font-bold text-choco">Bs. ${pvpBs.toFixed(2)}</span>
+                <span class="block text-[10px] font-semibold text-slate-600">€${pvpEur.toFixed(2)} EUR</span>
+              </div>
             </div>
           </div>
         `;
@@ -1663,7 +1848,7 @@
       recalcularFinanzas();
     }
     function agregarSobreprecioInflacion() {
-      const nom = prompt("Nombre del Ajuste (%):");
+      const nom = prompt("Nombre de la Variable (%):", "Colchón Inflación");
       if (!nom) return;
       const pct = parseFloat(prompt("Porcentaje (+ o -):", "10") || 0);
       state.sobrecostosProteccion.push({ id: "sp" + Date.now(), nombre: nom, porcentaje: pct, activo: true });
@@ -1680,7 +1865,10 @@
     }
     function aplicarMargenGlobalFin() {
       const m = parseFloat(document.getElementById("inputMargenGlobalFin").value || 45);
-      state.productos.forEach(p => p.margenGananciaPct = m);
+      state.productos.forEach(p => {
+        p.precioVentaManualActivo = false;
+        p.margenGananciaPct = m;
+      });
       recalcularFinanzas();
     }
 
