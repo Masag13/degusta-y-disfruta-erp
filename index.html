@@ -96,17 +96,21 @@
         </div>
       </div>
 
-      <div class="flex items-center gap-2 text-xs">
-        <div class="bg-orange-700/90 px-2.5 py-1 rounded-xl flex items-center gap-1.5">
+      <div class="flex flex-wrap items-center gap-2 text-xs">
+        <div class="bg-orange-700/90 px-2.5 py-1 rounded-xl flex items-center gap-1.5 border border-orange-500/40">
           <span class="text-[10px] text-orange-200 font-bold uppercase">USD BCV:</span>
           <span class="font-bold">Bs.</span>
-          <input type="number" id="inputTasaUsdGlobal" value="854.46" step="0.01" oninput="actualizarTasasGlobales()" class="w-16 bg-orange-800 text-white font-extrabold text-xs px-1.5 py-0.5 rounded text-center">
+          <input type="number" id="inputTasaUsdGlobal" value="854.46" step="0.01" oninput="actualizarTasasGlobales(true)" class="w-16 bg-orange-800 text-white font-extrabold text-xs px-1.5 py-0.5 rounded text-center">
         </div>
-        <div class="bg-orange-700/90 px-2.5 py-1 rounded-xl flex items-center gap-1.5">
+        <div class="bg-orange-700/90 px-2.5 py-1 rounded-xl flex items-center gap-1.5 border border-orange-500/40">
           <span class="text-[10px] text-orange-200 font-bold uppercase">EUR BCV:</span>
           <span class="font-bold">Bs.</span>
-          <input type="number" id="inputTasaEurGlobal" value="931.36" step="0.01" oninput="actualizarTasasGlobales()" class="w-16 bg-orange-800 text-white font-extrabold text-xs px-1.5 py-0.5 rounded text-center">
+          <input type="number" id="inputTasaEurGlobal" value="974.06" step="0.01" oninput="actualizarTasasGlobales(true)" class="w-16 bg-orange-800 text-white font-extrabold text-xs px-1.5 py-0.5 rounded text-center">
         </div>
+        <button type="button" onclick="sincronizarTasasBCVAutomatico(true)" id="btnAutoSyncBcv" title="Sincronización automática con BCV Oficial (Dólar y Euro)" class="bg-emerald-700 hover:bg-emerald-800 text-white px-2.5 py-1 rounded-xl flex items-center gap-1.5 font-extrabold text-[11px] shadow-sm transition">
+          <span id="iconoSyncBcv" class="inline-block w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+          <span id="badgeEstadoBcvAuto">Auto-BCV: Sincronizando...</span>
+        </button>
       </div>
     </div>
 
@@ -894,7 +898,9 @@
     let state = {
       operadorActivo: "Julio Cedeño (Dirección / Ruta)",
       tasaUsdBcv: 854.46,
-      tasaEurBcv: 931.36,
+      tasaEurBcv: 974.06,
+      ultimaSyncBcv: null,
+      tasaEditadaManualmente: false,
       filtroReceta: "TODOS",
       filtroCatInv: "TODOS",
       modoRevisionFisica: false,
@@ -1004,10 +1010,99 @@
       document.getElementById("compRegistradoPor").value = val;
       document.getElementById("responsableRevisionInput").value = val;
     }
-    function actualizarTasasGlobales() {
+    function actualizarTasasGlobales(esManual = false) {
       state.tasaUsdBcv = parseFloat(document.getElementById("inputTasaUsdGlobal").value || 854.46);
-      state.tasaEurBcv = parseFloat(document.getElementById("inputTasaEurGlobal").value || 931.36);
+      state.tasaEurBcv = parseFloat(document.getElementById("inputTasaEurGlobal").value || 974.06);
+      if (esManual) {
+        state.tasaEditadaManualmente = true;
+        const badge = document.getElementById("badgeEstadoBcvAuto");
+        if (badge) badge.innerText = "Tasa Manual (Clic para volver a BCV Auto)";
+      }
+      try {
+        localStorage.setItem("dyd_tasas_bcv_2026", JSON.stringify({
+          usd: state.tasaUsdBcv,
+          eur: state.tasaEurBcv,
+          fecha: new Date().toISOString(),
+          manual: state.tasaEditadaManualmente
+        }));
+      } catch (e) {}
       renderizarTodo();
+    }
+
+    async function sincronizarTasasBCVAutomatico(forzarClick = false) {
+      if (state.tasaEditadaManualmente && !forzarClick) return;
+      if (forzarClick) state.tasaEditadaManualmente = false;
+
+      const badge = document.getElementById("badgeEstadoBcvAuto");
+      const icono = document.getElementById("iconoSyncBcv");
+      if (badge) badge.innerText = "Sincronizando BCV (USD/EUR)...";
+
+      let nuevoUsd = null;
+      let nuevoEur = null;
+      let fechaRef = "";
+
+      // Fuente 1 (Principal): API Oficial BCV Dólar + Euro (ve.dolarapi.com/v1/cotizaciones)
+      try {
+        const res = await fetch("https://ve.dolarapi.com/v1/cotizaciones", { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            const itemUsd = data.find(d => d.moneda === "USD");
+            const itemEur = data.find(d => d.moneda === "EUR");
+            if (itemUsd && itemUsd.promedio > 0) nuevoUsd = parseFloat(itemUsd.promedio);
+            if (itemEur && itemEur.promedio > 0) nuevoEur = parseFloat(itemEur.promedio);
+            if (itemUsd?.fechaActualizacion) fechaRef = itemUsd.fechaActualizacion.slice(0, 10);
+          }
+        }
+      } catch (err1) {}
+
+      // Fuente 2 (Respaldo): ve.dolarapi.com/v1/dolares/oficial + open.er-api.com/v6/latest/USD
+      if (!nuevoUsd || !nuevoEur) {
+        try {
+          const [resUsd, resEr] = await Promise.allSettled([
+            fetch("https://ve.dolarapi.com/v1/dolares/oficial", { cache: "no-store" }),
+            fetch("https://open.er-api.com/v6/latest/USD", { cache: "no-store" })
+          ]);
+          if (resUsd.status === "fulfilled" && resUsd.value.ok) {
+            const dUsd = await resUsd.value.json();
+            if (dUsd?.promedio > 0) nuevoUsd = parseFloat(dUsd.promedio);
+          }
+          if (resEr.status === "fulfilled" && resEr.value.ok) {
+            const dEr = await resEr.value.json();
+            if (!nuevoUsd && dEr?.rates?.VES > 0) nuevoUsd = parseFloat(dEr.rates.VES);
+            if (nuevoUsd && !nuevoEur && dEr?.rates?.EUR > 0) {
+              nuevoEur = nuevoUsd / parseFloat(dEr.rates.EUR);
+            }
+          }
+        } catch (err2) {}
+      }
+
+      if (nuevoUsd && nuevoUsd > 0) {
+        state.tasaUsdBcv = parseFloat(nuevoUsd.toFixed(2));
+        document.getElementById("inputTasaUsdGlobal").value = state.tasaUsdBcv.toFixed(2);
+      }
+      if (nuevoEur && nuevoEur > 0) {
+        state.tasaEurBcv = parseFloat(nuevoEur.toFixed(2));
+        document.getElementById("inputTasaEurGlobal").value = state.tasaEurBcv.toFixed(2);
+      }
+
+      const horaStr = new Date().toLocaleTimeString("es-VE", { hour: "2-digit", minute: "2-digit" });
+      if (nuevoUsd || nuevoEur) {
+        state.ultimaSyncBcv = horaStr;
+        if (badge) badge.innerText = `BCV En Vivo (${fechaRef || 'Hoy'} · ${horaStr})`;
+        if (icono) icono.className = "inline-block w-2 h-2 rounded-full bg-emerald-300";
+        try {
+          localStorage.setItem("dyd_tasas_bcv_2026", JSON.stringify({
+            usd: state.tasaUsdBcv,
+            eur: state.tasaEurBcv,
+            fecha: new Date().toISOString(),
+            manual: false
+          }));
+        } catch (e) {}
+        renderizarTodo();
+      } else {
+        if (badge) badge.innerText = `BCV Caché ($${state.tasaUsdBcv.toFixed(2)} / €${state.tasaEurBcv.toFixed(2)})`;
+      }
     }
     function cambiarPestana(tabId) {
       cerrarSidebar();
@@ -2204,8 +2299,26 @@
     }
 
     window.addEventListener("DOMContentLoaded", () => {
+      try {
+        const cache = JSON.parse(localStorage.getItem("dyd_tasas_bcv_2026") || "null");
+        if (cache && cache.usd > 0 && cache.eur > 0) {
+          state.tasaUsdBcv = parseFloat(cache.usd);
+          state.tasaEurBcv = parseFloat(cache.eur);
+          document.getElementById("inputTasaUsdGlobal").value = state.tasaUsdBcv.toFixed(2);
+          document.getElementById("inputTasaEurGlobal").value = state.tasaEurBcv.toFixed(2);
+        }
+      } catch (e) {}
+
       inicializarCanvasFirma();
       renderizarTodo();
+
+      // Sincronización automática inmediata al abrir la aplicación
+      sincronizarTasasBCVAutomatico();
+
+      // Actualización automática cada 15 minutos y al volver a la pestaña o recuperar internet
+      setInterval(() => sincronizarTasasBCVAutomatico(), 15 * 60 * 1000);
+      window.addEventListener("focus", () => sincronizarTasasBCVAutomatico());
+      window.addEventListener("online", () => sincronizarTasasBCVAutomatico());
     });
   </script>
 </body>
