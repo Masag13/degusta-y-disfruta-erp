@@ -2583,6 +2583,7 @@
         state.sobrecostosProteccion[0].porcentaje = pct;
         state.sobrecostosProteccion[0].activo = true;
       }
+      guardarSobrecostosStorage();
       recalcularFinanzas();
     }
 
@@ -2591,6 +2592,7 @@
       if (!p) return;
       const v = parseFloat(valStr);
       p.colchonInflacionPersonalizadoPct = isNaN(v) ? null : v;
+      guardarProductosStorage();
       recalcularFinanzas();
     }
 
@@ -2604,6 +2606,7 @@
       if (p._ultimoCostoProtegidoPaq && p._ultimoCostoProtegidoPaq > 0) {
         p.margenGananciaPct = +(((pvp / p._ultimoCostoProtegidoPaq) - 1) * 100).toFixed(1);
       }
+      guardarProductosStorage();
       recalcularFinanzas();
     }
 
@@ -2612,6 +2615,7 @@
       if (!p) return;
       p.precioVentaManualActivo = false;
       p.margenGananciaPct = parseFloat(nuevoMargenStr || 0);
+      guardarProductosStorage();
       recalcularFinanzas();
     }
 
@@ -2622,24 +2626,28 @@
         document.getElementById("inputBaseAbsorcionMes").value = vendidasPedidos;
       }
       const baseAbsorcion = Math.max(1, parseFloat(document.getElementById("inputBaseAbsorcionMes").value || vendidasPedidos));
-      const sumaFijos = state.costosFijosMensuales.reduce((a, b) => a + b.montoUSD, 0);
+      const sumaFijos = state.costosFijosMensuales.reduce((a, b) => a + (parseFloat(b.montoUSD)||0), 0);
       const cuotaFijaPaq = sumaFijos / baseAbsorcion;
 
       document.getElementById("kpiSumaCostosFijosMes").innerText = "$" + sumaFijos.toFixed(2);
       document.getElementById("kpiCuotaFijaPorUnidad").innerText = `Fijo/paquete: $${cuotaFijaPaq.toFixed(4)}`;
 
-      document.getElementById("contenedorCostosFijosCRUD").innerHTML = state.costosFijosMensuales.map((cf, idx) => `
+      document.getElementById("contenedorCostosFijosCRUD").innerHTML = state.costosFijosMensuales.length > 0 ? state.costosFijosMensuales.map((cf, idx) => `
         <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between gap-2 text-xs">
           <div class="min-w-0 flex-1">
             <span class="font-extrabold text-choco block truncate">${cf.nombre}</span>
-            <span class="text-salvia font-extrabold">$${cf.montoUSD.toFixed(2)}</span>
+            <span class="text-salvia font-extrabold">$${parseFloat(cf.montoUSD||0).toFixed(2)}</span>
           </div>
           <div class="flex gap-1 shrink-0">
-            <button onclick="editarCostoFijo(${idx})" class="px-2 py-1 bg-hueso text-choco rounded-lg font-bold">✏️</button>
-            <button onclick="eliminarCostoFijo(${idx})" class="px-2 py-1 bg-red-100 text-red-700 rounded-lg font-bold">🗑️</button>
+            <button onclick="editarCostoFijo(${idx})" class="px-2 py-1 bg-hueso text-choco rounded-lg font-bold hover:bg-slate-200">✏️</button>
+            <button onclick="eliminarCostoFijo(${idx})" class="px-2 py-1 bg-red-100 text-red-700 rounded-lg font-bold hover:bg-red-200">🗑️</button>
           </div>
         </div>
-      `).join("");
+      `).join("") : `
+        <div class="p-4 text-center text-xs text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+          No hay gastos fijos registrados. Pulsa "+ Agregar Gasto Fijo" para crear uno.
+        </div>
+      `;
 
       if (state.sobrecostosProteccion.length > 0) {
         const inpColchon = document.getElementById("inputColchonInflacionDirecto");
@@ -2648,25 +2656,29 @@
         }
       }
 
-      const totalPctSobreprecio = state.sobrecostosProteccion.filter(s => s.activo).reduce((a, b) => a + b.porcentaje, 0);
+      const totalPctSobreprecio = state.sobrecostosProteccion.filter(s => s.activo).reduce((a, b) => a + (parseFloat(b.porcentaje)||0), 0);
       document.getElementById("kpiTotalSobrecostoPct").innerText = "Total: " + (totalPctSobreprecio >= 0 ? "+" : "") + totalPctSobreprecio.toFixed(1) + "%";
 
-      document.getElementById("contenedorSobrepreciosCRUD").innerHTML = state.sobrecostosProteccion.map((sp, idx) => `
+      document.getElementById("contenedorSobrepreciosCRUD").innerHTML = state.sobrecostosProteccion.length > 0 ? state.sobrecostosProteccion.map((sp, idx) => `
         <div class="p-2.5 bg-hueso/50 rounded-xl border border-huesoBorde flex items-center justify-between gap-2 text-xs">
           <label class="flex items-center gap-2 cursor-pointer min-w-0 flex-1">
-            <input type="checkbox" ${sp.activo ? 'checked' : ''} onchange="state.sobrecostosProteccion[${idx}].activo=this.checked;recalcularFinanzas()">
+            <input type="checkbox" ${sp.activo ? 'checked' : ''} onchange="state.sobrecostosProteccion[${idx}].activo=this.checked;guardarSobrecostosStorage();recalcularFinanzas()">
             <span class="font-extrabold text-choco truncate">${sp.nombre}</span>
           </label>
           <div class="flex items-center gap-1 shrink-0">
             <input type="number" value="${sp.porcentaje}" step="0.5"
-              oninput="state.sobrecostosProteccion[${idx}].porcentaje=parseFloat(this.value||0);recalcularFinanzas()"
+              oninput="state.sobrecostosProteccion[${idx}].porcentaje=parseFloat(this.value||0);guardarSobrecostosStorage();recalcularFinanzas()"
               class="w-14 px-1.5 py-1 bg-white border border-choco/40 rounded-lg font-extrabold text-center text-choco">
             <span class="font-bold text-choco">%</span>
-            <button onclick="editarSobreprecioInflacion(${idx})" class="px-2 py-1 bg-white border border-huesoBorde rounded font-bold">✏️</button>
-            <button onclick="state.sobrecostosProteccion.splice(${idx},1);recalcularFinanzas()" class="px-2 py-1 bg-red-100 text-red-700 rounded font-bold">🗑️</button>
+            <button onclick="editarSobreprecioInflacion(${idx})" class="px-2 py-1 bg-white border border-huesoBorde rounded font-bold hover:bg-slate-100">✏️</button>
+            <button onclick="eliminarSobreprecioInflacion(${idx})" class="px-2 py-1 bg-red-100 text-red-700 rounded font-bold hover:bg-red-200">🗑️</button>
           </div>
         </div>
-      `).join("");
+      `).join("") : `
+        <div class="p-4 text-center text-xs text-slate-400 bg-hueso/30 rounded-xl border border-dashed border-huesoBorde">
+          Sin variables de sobrecosto adicionales.
+        </div>
+      `;
 
       if (state.productos.length === 0) {
         document.getElementById("tablaFinanzasProductos").innerHTML = `
@@ -2760,48 +2772,91 @@
       }).join("");
     }
 
+    function guardarCostosFijosStorage() {
+      try {
+        localStorage.setItem("dyd_costos_fijos_custom", JSON.stringify(state.costosFijosMensuales));
+      } catch (e) {
+        console.error("Error al guardar costos fijos en localStorage", e);
+      }
+    }
+
+    function guardarSobrecostosStorage() {
+      try {
+        localStorage.setItem("dyd_sobrecostos_custom", JSON.stringify(state.sobrecostosProteccion));
+      } catch (e) {
+        console.error("Error al guardar sobrecostos en localStorage", e);
+      }
+    }
+
     function editarCostoFijo(idx) {
       const cf = state.costosFijosMensuales[idx];
+      if (!cf) return;
       const nuevoNom = prompt("Nombre del Gasto Fijo:", cf.nombre);
       if (nuevoNom === null) return;
       const nuevoMonto = prompt("Monto Mensual ($):", cf.montoUSD);
       cf.nombre = nuevoNom.trim() || cf.nombre;
       if (nuevoMonto !== null) cf.montoUSD = parseFloat(nuevoMonto || 0);
+      guardarCostosFijosStorage();
       recalcularFinanzas();
     }
+
     function eliminarCostoFijo(idx) {
+      const cf = state.costosFijosMensuales[idx];
+      if (!cf) return;
+      const conf = confirm(`¿Estás seguro de que deseas eliminar el gasto fijo "${cf.nombre}" ($${parseFloat(cf.montoUSD||0).toFixed(2)})?`);
+      if (!conf) return;
       state.costosFijosMensuales.splice(idx, 1);
+      guardarCostosFijosStorage();
       recalcularFinanzas();
     }
+
     function agregarCostoFijoNuevo() {
       const nom = prompt("Nombre del Gasto Fijo:");
-      if (!nom) return;
+      if (!nom || !nom.trim()) return;
       const m = parseFloat(prompt("Monto Mensual ($):", "50") || 0);
-      state.costosFijosMensuales.push({ id: "cf" + Date.now(), nombre: nom, montoUSD: m });
+      state.costosFijosMensuales.push({ id: "cf" + Date.now(), nombre: nom.trim(), montoUSD: m });
+      guardarCostosFijosStorage();
       recalcularFinanzas();
     }
+
     function agregarSobreprecioInflacion() {
       const nom = prompt("Nombre de la Variable (%):", "Colchón Inflación");
-      if (!nom) return;
+      if (!nom || !nom.trim()) return;
       const pct = parseFloat(prompt("Porcentaje (+ o -):", "10") || 0);
-      state.sobrecostosProteccion.push({ id: "sp" + Date.now(), nombre: nom, porcentaje: pct, activo: true });
+      state.sobrecostosProteccion.push({ id: "sp" + Date.now(), nombre: nom.trim(), porcentaje: pct, activo: true });
+      guardarSobrecostosStorage();
       recalcularFinanzas();
     }
+
     function editarSobreprecioInflacion(idx) {
       const sp = state.sobrecostosProteccion[idx];
+      if (!sp) return;
       const nom = prompt("Nombre:", sp.nombre);
       if (nom === null) return;
       const pct = prompt("Porcentaje (%):", sp.porcentaje);
-      sp.nombre = nom;
+      sp.nombre = nom.trim() || sp.nombre;
       if (pct !== null) sp.porcentaje = parseFloat(pct || 0);
+      guardarSobrecostosStorage();
       recalcularFinanzas();
     }
+
+    function eliminarSobreprecioInflacion(idx) {
+      const sp = state.sobrecostosProteccion[idx];
+      if (!sp) return;
+      const conf = confirm(`¿Estás seguro de que deseas eliminar la variable "${sp.nombre}"?`);
+      if (!conf) return;
+      state.sobrecostosProteccion.splice(idx, 1);
+      guardarSobrecostosStorage();
+      recalcularFinanzas();
+    }
+
     function aplicarMargenGlobalFin() {
       const m = parseFloat(document.getElementById("inputMargenGlobalFin").value || 45);
       state.productos.forEach(p => {
         p.precioVentaManualActivo = false;
         p.margenGananciaPct = m;
       });
+      guardarProductosStorage();
       recalcularFinanzas();
     }
 
@@ -3453,6 +3508,20 @@
           }
         } catch (e) {}
       }
+
+      try {
+        const cfGuardados = JSON.parse(localStorage.getItem("dyd_costos_fijos_custom") || "null");
+        if (Array.isArray(cfGuardados)) {
+          state.costosFijosMensuales = cfGuardados;
+        }
+      } catch (e) {}
+
+      try {
+        const spGuardados = JSON.parse(localStorage.getItem("dyd_sobrecostos_custom") || "null");
+        if (Array.isArray(spGuardados)) {
+          state.sobrecostosProteccion = spGuardados;
+        }
+      } catch (e) {}
 
       try {
         const cache = JSON.parse(localStorage.getItem("dyd_tasas_bcv_2026") || "null");
