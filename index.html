@@ -769,9 +769,13 @@
         </div>
       </div>
 
-      <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
+      <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-between items-center gap-2">
+        <button type="button" id="btnEliminarRecetaModal" onclick="eliminarRecetaDesdeModal()" class="hidden px-3.5 py-1.5 bg-red-100 text-red-700 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5">
+          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+          <span>Eliminar Receta</span>
+        </button>
         <div id="fResumenCostosFinalModal" class="text-xs font-extrabold text-choco"></div>
-        <div class="flex gap-2">
+        <div class="flex gap-2 ml-auto">
           <button onclick="cerrarModalFormulaDyD()" class="px-3.5 py-1.5 bg-hueso text-choco rounded-xl text-xs font-bold">Cancelar</button>
           <button onclick="guardarFormulaDyDModal()" class="px-4 py-1.5 bg-salvia text-huesoClaro rounded-xl text-xs font-extrabold shadow">💾 Guardar</button>
         </div>
@@ -1372,7 +1376,22 @@
       renderizarRecetas();
     }
 
+    function actualizarContadoresFiltroRecetas() {
+      const total = state.productos.length;
+      const panaderia = state.productos.filter(p => p.tipoProducto === "PRODUCTO_TERMINADO").length;
+      const reventa = state.productos.filter(p => p.tipoProducto === "REVENTA_MAKILA").length;
+
+      const bTodos = document.getElementById("fRec-TODOS");
+      const bPan = document.getElementById("fRec-PRODUCTO_TERMINADO");
+      const bRev = document.getElementById("fRec-REVENTA_MAKILA");
+
+      if (bTodos) bTodos.textContent = `Todos (${total})`;
+      if (bPan) bPan.textContent = `🥖 Panadería (${panaderia})`;
+      if (bRev) bRev.textContent = `🥟 Reventa (${reventa})`;
+    }
+
     function renderizarRecetas() {
+      actualizarContadoresFiltroRecetas();
       const q = (document.getElementById("buscarRecetaInput")?.value || "").toLowerCase();
       const cont = document.getElementById("gridRecetasContainer");
       if (!cont) return;
@@ -1416,9 +1435,14 @@
                   </div>
                 </div>
               </div>
-              <button onclick="abrirModalFormulaDyD('${p.id}')" class="w-full py-2 bg-choco hover:bg-chocoDark text-hueso font-extrabold rounded-xl text-xs">
-                ✏️ Editar Fórmula de la Unidad
-              </button>
+              <div class="flex gap-2">
+                <button onclick="abrirModalFormulaDyD('${p.id}')" class="flex-1 py-2 bg-choco hover:bg-chocoDark text-hueso font-extrabold rounded-xl text-xs transition">
+                  ✏️ Editar Fórmula
+                </button>
+                <button onclick="eliminarRecetaProducto('${p.id}')" title="Eliminar receta" class="px-3 py-2 bg-red-100 hover:bg-red-600 text-red-700 hover:text-white font-extrabold rounded-xl text-xs transition">
+                  🗑️
+                </button>
+              </div>
             </div>
           `;
         }
@@ -1448,11 +1472,14 @@
                 </div>
               </div>
               <div class="flex gap-1.5">
-                <button onclick="abrirModalFormulaDyD('${p.id}')" class="flex-1 py-2 bg-choco hover:bg-chocoDark text-hueso font-extrabold rounded-xl text-xs">
+                <button onclick="abrirModalFormulaDyD('${p.id}')" class="flex-1 py-2 bg-choco hover:bg-chocoDark text-hueso font-extrabold rounded-xl text-xs transition">
                   ✏️ Armar Empaque
                 </button>
-                <button onclick="cambiarPestana('finanzas')" class="px-3 py-2 bg-hueso text-choco font-extrabold rounded-xl text-xs">
-                  💲 Precio Venta
+                <button onclick="cambiarPestana('finanzas')" class="px-2.5 py-2 bg-hueso text-choco font-extrabold rounded-xl text-xs transition">
+                  💲 Precio
+                </button>
+                <button onclick="eliminarRecetaProducto('${p.id}')" title="Eliminar receta" class="px-2.5 py-2 bg-red-100 hover:bg-red-600 text-red-700 hover:text-white font-extrabold rounded-xl text-xs transition">
+                  🗑️
                 </button>
               </div>
             </div>
@@ -1484,9 +1511,14 @@
               </div>
             </div>
 
-            <button onclick="abrirModalFormulaDyD('${p.id}')" class="w-full py-2 bg-choco hover:bg-chocoDark text-hueso font-extrabold rounded-xl text-xs">
-              ✏️ Editar Unidad y Empaque
-            </button>
+            <div class="flex gap-2">
+              <button onclick="abrirModalFormulaDyD('${p.id}')" class="flex-1 py-2 bg-choco hover:bg-chocoDark text-hueso font-extrabold rounded-xl text-xs transition">
+                ✏️ Editar Unidad y Empaque
+              </button>
+              <button onclick="eliminarRecetaProducto('${p.id}')" title="Eliminar receta" class="px-3 py-2 bg-red-100 hover:bg-red-600 text-red-700 hover:text-white font-extrabold rounded-xl text-xs transition">
+                🗑️
+              </button>
+            </div>
           </div>
         `;
       }).join("");
@@ -1500,6 +1532,8 @@
 
       if (!prodId) {
         state.formulaEditandoId = null;
+        const btnDel = document.getElementById("btnEliminarRecetaModal");
+        if (btnDel) btnDel.classList.add("hidden");
         document.getElementById("fNombreProd").value = "PAQUETE PAN PERRO CALIENTE X 8 UND";
         document.getElementById("fSubtipoAntelacion").value = "1";
         document.getElementById("fUnidadesPaquete").value = "8";
@@ -1523,6 +1557,8 @@
         const p = state.productos.find(x => x.id === prodId);
         if (!p) return;
         state.formulaEditandoId = p.id;
+        const btnDel = document.getElementById("btnEliminarRecetaModal");
+        if (btnDel) btnDel.classList.remove("hidden");
         document.getElementById("fNombreProd").value = p.nombre;
         document.getElementById("fSubtipoAntelacion").value = String(p.diasAntelacion ?? 1);
         document.getElementById("fUnidadesPaquete").value = p.unidadesPorPaquete || 8;
@@ -1663,8 +1699,99 @@
       } else {
         state.productos.unshift(obj);
       }
+
+      // Sincronizar con inventario (Producto Terminado / Reventa)
+      const invIdx = state.inventario.findIndex(x => x.id === obj.id || x.sku === obj.id);
+      if (invIdx !== -1) {
+        state.inventario[invIdx].nombre = obj.nombre;
+        state.inventario[invIdx].categoriaCodigo = obj.tipoProducto;
+        state.inventario[invIdx].precioPorUnidad = obj.costoMateriaPrima;
+        state.inventario[invIdx].precioVenta = obj.precioVentaUSD;
+      } else {
+        state.inventario.push({
+          id: obj.id,
+          sku: obj.sku,
+          nombre: obj.nombre,
+          categoriaCodigo: obj.tipoProducto,
+          unidadMedida: "PAQUETE",
+          stockActual: obj.stockPaquetesEmpacadosListos || 50,
+          stockMinimo: 20,
+          precioPorUnidad: obj.costoMateriaPrima,
+          precioVenta: obj.precioVentaUSD,
+          presentacionComercial: "Paquete",
+          ubicacion: "Despacho"
+        });
+      }
+
+      guardarProductosStorage();
+      guardarInventarioStorage();
       cerrarModalFormulaDyD();
       renderizarTodo();
+    }
+
+    function guardarProductosStorage() {
+      try {
+        localStorage.setItem("dyd_productos_custom", JSON.stringify(state.productos));
+      } catch (e) {
+        console.error("Error al guardar productos en localStorage", e);
+      }
+    }
+
+    function eliminarRecetaProducto(id) {
+      if (!id) return false;
+      const prod = state.productos.find(p => p.id === id);
+      if (!prod) return false;
+
+      // Verificar si hay pedidos asociados con este producto
+      const pedidosConProd = (state.pedidos || []).filter(ped =>
+        (ped.items || []).some(it => it.productoId === id || it.nombre === prod.nombre)
+      );
+
+      let advertencia = "";
+      if (pedidosConProd.length > 0) {
+        advertencia = `\n\n⚠️ ATENCIÓN: Este producto tiene ${pedidosConProd.length} pedido(s) registrado(s). Los pedidos existentes mantendrán su registro histórico, pero la fórmula y el producto terminado serán eliminados del catálogo.`;
+      }
+
+      const confirmacion = confirm(`¿Estás seguro de que deseas eliminar la receta y producto "${prod.nombre}" (${prod.id})?${advertencia}\n\nEsta acción no se puede deshacer.`);
+      if (!confirmacion) return false;
+
+      // 1. Eliminar de productos
+      state.productos = state.productos.filter(p => p.id !== id);
+
+      // 2. Eliminar del inventario de producto terminado/reventa
+      state.inventario = state.inventario.filter(x => x.id !== id && x.sku !== id);
+
+      // 3. Registrar en bitácora de inventario
+      if (!state.bitacoraInventario) state.bitacoraInventario = [];
+      state.bitacoraInventario.unshift({
+        id: "BIT-" + Date.now(),
+        fecha: new Date().toISOString(),
+        usuario: "Administrador",
+        accion: "ELIMINAR RECETA",
+        itemId: prod.id,
+        itemNombre: prod.nombre,
+        categoria: prod.tipoProducto,
+        cantidadAfectada: 0,
+        costoTotalUSD: 0,
+        motivo: `Eliminación de receta y fórmula panadera: ${prod.nombre}`
+      });
+
+      // 4. Persistir
+      guardarProductosStorage();
+      guardarInventarioStorage();
+
+      // 5. Renderizar
+      renderizarTodo();
+      return true;
+    }
+
+    function eliminarRecetaDesdeModal() {
+      if (!state.formulaEditandoId) return;
+      const id = state.formulaEditandoId;
+      const eliminada = eliminarRecetaProducto(id);
+      if (eliminada) {
+        cerrarModalFormulaDyD();
+      }
     }
 
 
@@ -3262,6 +3389,7 @@
     }
 
     function renderizarTodo() {
+      actualizarContadoresFiltroRecetas();
       renderizarRecetas();
       renderizarInventario();
       recalcularFinanzas();
@@ -3281,6 +3409,13 @@
     }
 
     window.addEventListener("DOMContentLoaded", () => {
+      try {
+        const prodGuardados = JSON.parse(localStorage.getItem("dyd_productos_custom") || "null");
+        if (Array.isArray(prodGuardados) && prodGuardados.length > 0) {
+          state.productos = prodGuardados;
+        }
+      } catch (e) {}
+
       try {
         const invGuardado = JSON.parse(localStorage.getItem("dyd_inventario_custom") || "null");
         if (Array.isArray(invGuardado) && invGuardado.length > 0) {
