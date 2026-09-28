@@ -244,8 +244,16 @@
          2. INVENTARIO
          ======================================================================= -->
     <section id="tab-inventario" class="tab-content space-y-4">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <button onclick="abrirModalListaPreciosMP()" class="p-3.5 rounded-2xl bg-choco text-hueso shadow text-left flex items-center justify-between border-2 border-caramelo">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <button onclick="abrirModalCrearMaterial()" class="p-3.5 rounded-2xl bg-salvia text-huesoClaro shadow text-left flex items-center justify-between border-2 border-emerald-600/30 hover:brightness-105 transition">
+          <div>
+            <h3 class="font-extrabold text-sm">➕ Nuevo Material / Ítem</h3>
+            <p class="text-[11px] opacity-90">Registrar materia prima, empaque u otro</p>
+          </div>
+          <i data-lucide="plus-circle" class="w-6 h-6 shrink-0"></i>
+        </button>
+
+        <button onclick="abrirModalListaPreciosMP()" class="p-3.5 rounded-2xl bg-choco text-hueso shadow text-left flex items-center justify-between border-2 border-caramelo hover:brightness-105 transition">
           <div>
             <h3 class="font-extrabold text-sm">💲 Lista de Precios MP</h3>
             <p class="text-[11px] opacity-90">Actualizar costos de materia prima</p>
@@ -253,15 +261,15 @@
           <i data-lucide="dollar-sign" class="w-6 h-6 shrink-0"></i>
         </button>
 
-        <button onclick="abrirModalCompra()" class="p-3.5 rounded-2xl bg-salvia text-huesoClaro shadow text-left flex items-center justify-between">
+        <button onclick="abrirModalCompra()" class="p-3.5 rounded-2xl bg-choco text-hueso shadow text-left flex items-center justify-between hover:brightness-105 transition">
           <div>
-            <h3 class="font-extrabold text-sm">➕ Registrar Compra</h3>
+            <h3 class="font-extrabold text-sm">🛒 Registrar Compra</h3>
             <p class="text-[11px] opacity-90">Efectivo $, Bs, Zelle o Pago Mixto</p>
           </div>
           <i data-lucide="shopping-bag" class="w-6 h-6 shrink-0"></i>
         </button>
 
-        <button onclick="activarModoRevisionFisica()" class="p-3.5 rounded-2xl bg-choco text-hueso shadow text-left flex items-center justify-between">
+        <button onclick="activarModoRevisionFisica()" class="p-3.5 rounded-2xl bg-choco text-hueso shadow text-left flex items-center justify-between hover:brightness-105 transition">
           <div>
             <h3 class="font-extrabold text-sm">📋 Conteo Físico</h3>
             <p class="text-[11px] opacity-90">Comparar inventario real vs sistema</p>
@@ -269,28 +277,31 @@
           <i data-lucide="clipboard-check" class="w-6 h-6 shrink-0"></i>
         </button>
 
-        <button onclick="abrirModalMaestroMateriales()" class="p-3.5 rounded-2xl bg-caramelo text-huesoClaro shadow text-left flex items-center justify-between">
+        <button onclick="abrirModalMaestroMateriales()" class="p-3.5 rounded-2xl bg-caramelo text-huesoClaro shadow text-left flex items-center justify-between hover:brightness-105 transition">
           <div>
-            <h3 class="font-extrabold text-sm">🛠️ Materiales y Presentaciones</h3>
-            <p class="text-[11px] opacity-90">Editar nombres, empaques y proveedores</p>
+            <h3 class="font-extrabold text-sm">🛠️ Presentaciones Rápidas</h3>
+            <p class="text-[11px] opacity-90">Editar empaques y descripciones</p>
           </div>
           <i data-lucide="settings" class="w-6 h-6 shrink-0"></i>
         </button>
       </div>
 
-      <!-- Filtros de Categorías -->
-      <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-200 space-y-2.5">
-        <div class="flex flex-wrap gap-1.5">
-          <button onclick="setCatInv('TODOS')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-choco text-hueso">Todos (155)</button>
-          <button onclick="setCatInv('MATERIA_PRIMA')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-hueso text-choco">🌾 Materia Prima (98)</button>
-          <button onclick="setCatInv('EMPAQUE')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-hueso text-choco">🏷️ Empaque (14)</button>
-          <button onclick="setCatInv('LIMPIEZA')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-hueso text-choco">🧼 Limpieza (2)</button>
-          <button onclick="setCatInv('ACTIVOS_PLANTA')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-hueso text-choco">🧺 Cestas y Bandejas (2)</button>
-          <button onclick="setCatInv('PRODUCTO_TERMINADO')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-hueso text-choco">🥖 Pan Terminado (31)</button>
-          <button onclick="setCatInv('REVENTA_MAKILA')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-hueso text-choco">🥟 Reventa (8)</button>
+      <!-- Filtros de Categorías y Buscador -->
+      <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200 space-y-2.5">
+        <div id="filtroCategoriasInvContainer" class="flex flex-wrap gap-1.5">
+          <!-- Renderizado dinámicamente con contadores en tiempo real -->
         </div>
-        <input type="text" id="buscarInvInput" oninput="renderizarInventario()" placeholder="Buscar material o producto..."
-          class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold">
+        <div class="flex items-center gap-2">
+          <div class="relative flex-1">
+            <input type="text" id="buscarInvInput" oninput="renderizarInventario()" placeholder="Buscar material o producto por nombre, SKU o empaque..."
+              class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold focus:border-choco outline-none">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+          </div>
+          <button onclick="abrirModalCrearMaterial()" class="shrink-0 px-3.5 py-2 bg-salvia text-huesoClaro rounded-xl text-xs font-extrabold flex items-center gap-1.5 shadow hover:brightness-105 transition">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">Nuevo Ítem</span>
+          </button>
+        </div>
       </div>
 
       <!-- Barra de Conteo Físico -->
@@ -858,7 +869,176 @@
     </div>
   </div>
 
-  <!-- ================= MODAL 3: MATERIALES Y PRESENTACIONES ================= -->
+  <!-- ================= MODAL: CREAR / EDITAR MATERIAL O ÍTEM DE INVENTARIO ================= -->
+  <div id="modalCrearEditarMaterial" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 no-print">
+    <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden text-xs">
+      
+      <!-- Modal Header -->
+      <div class="p-4 bg-choco text-hueso flex justify-between items-center border-b border-chocoDark shrink-0">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-caramelo flex items-center justify-center text-white">
+            <i data-lucide="package" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 id="modalMatTitulo" class="font-extrabold text-sm sm:text-base text-huesoClaro">➕ Nuevo Material / Ítem</h3>
+            <p class="text-[11px] text-hueso/80">Configura nombre, categoría, presentación, costos y stock</p>
+          </div>
+        </div>
+        <button onclick="cerrarModalMaterial()" class="p-1.5 rounded-xl bg-chocoDark text-hueso hover:bg-caramelo transition font-bold text-sm">✕</button>
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div class="p-4 sm:p-5 overflow-y-auto space-y-4">
+        <input type="hidden" id="formMatId">
+
+        <!-- Categoría y Código SKU -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="sm:col-span-2">
+            <label class="block font-bold text-choco mb-1">Categoría del Material / Ítem <span class="text-red-500">*</span></label>
+            <select id="formMatCategoria" onchange="actualizarPlaceholderMatSku()" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold text-choco focus:border-choco outline-none">
+              <option value="MATERIA_PRIMA">🌾 1. Materia Prima Directa (Ingredientes)</option>
+              <option value="EMPAQUE">🏷️ 2. Material de Empaque y Etiquetado</option>
+              <option value="LIMPIEZA">🧼 3. Suministros de Limpieza y Planta</option>
+              <option value="ACTIVOS_PLANTA">🧺 4. Suministros de Planta: Cestas y Bandejas</option>
+              <option value="PRODUCTO_TERMINADO">🥖 5. Productos Terminados (Fabricación Propia)</option>
+              <option value="REVENTA_MAKILA">🥟 6. Productos Comprados para Reventa</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-choco mb-1">Código / SKU <span class="text-[10px] text-slate-400 font-normal">(Auto si vacío)</span></label>
+            <input type="text" id="formMatSku" placeholder="Ej: MP-105" class="w-full p-2.5 border border-slate-300 rounded-xl font-bold text-choco focus:border-choco outline-none">
+          </div>
+        </div>
+
+        <!-- Nombre Completo -->
+        <div>
+          <label class="block font-bold text-choco mb-1">Nombre Completo del Material / Ítem <span class="text-red-500">*</span></label>
+          <input type="text" id="formMatNombre" placeholder="Ej: ACEITE DE OLEINA DE PALMA AVEIRO. KROPAN" class="w-full p-2.5 border border-slate-300 rounded-xl font-bold text-choco focus:border-choco outline-none text-xs sm:text-sm">
+        </div>
+
+        <!-- Presentación, Tamaño y Unidad de Medida -->
+        <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+          <div class="font-extrabold text-choco flex items-center justify-between">
+            <span class="flex items-center gap-1.5">
+              <i data-lucide="box" class="w-4 h-4 text-caramelo"></i>
+              Presentación y Empaque de Compra
+            </span>
+            <span class="text-[10px] text-slate-500 font-medium">Define cómo se compra o almacena</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label class="font-bold text-slate-700">Tipo de Empaque</label>
+                <button type="button" onclick="agregarNuevoTipoPresentacionForm()" class="text-[10px] text-choco font-extrabold underline hover:text-caramelo">+ Añadir</button>
+              </div>
+              <select id="formMatPresentacionTipo" class="w-full p-2 bg-white border border-slate-300 rounded-xl font-bold text-choco focus:border-choco outline-none">
+                <option value="Bolsa / Envase">Bolsa / Envase</option>
+                <option value="Saco">Saco</option>
+                <option value="Paquete / Millar">Paquete / Millar</option>
+                <option value="Bidón">Bidón</option>
+                <option value="Paila">Paila</option>
+                <option value="Caja">Caja</option>
+                <option value="Bandeja">Bandeja</option>
+                <option value="Unidad">Unidad</option>
+                <option value="Paquete x 12 und">Paquete x 12 und</option>
+                <option value="Paquete x 10 und">Paquete x 10 und</option>
+                <option value="Paquete x 8 und">Paquete x 8 und</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Contenido por Empaque <span class="text-red-500">*</span></label>
+              <input type="number" id="formMatEmpaqueTam" value="1.0" min="0.0001" step="any" oninput="calcularCostosFormMaterial()" class="w-full p-2 bg-white border border-slate-300 rounded-xl font-extrabold text-choco focus:border-choco outline-none text-center">
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Unidad de Medida <span class="text-red-500">*</span></label>
+              <select id="formMatUnidadMedida" onchange="calcularCostosFormMaterial()" class="w-full p-2 bg-white border border-slate-300 rounded-xl font-bold text-choco focus:border-choco outline-none">
+                <option value="Kg.">Kg. (Kilogramos)</option>
+                <option value="Lt.">Lt. (Litros)</option>
+                <option value="Und.">Und. (Unidades)</option>
+                <option value="gr.">gr. (Gramos)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Precios y Costos -->
+        <div class="p-3 bg-hueso/40 rounded-2xl border border-huesoBorde space-y-3">
+          <div class="font-extrabold text-choco flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <i data-lucide="dollar-sign" class="w-4 h-4 text-salvia"></i>
+              <span>Precio de Compra y Costo Unitario</span>
+            </div>
+            <span class="text-[10px] text-slate-500 font-semibold">Tasa BCV: <strong id="formMatTasaBcvSpan">Bs. 854.46</strong></span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+            <div>
+              <label class="block font-bold text-choco mb-1">Precio Compra del Empaque Completo ($ USD) <span class="text-red-500">*</span></label>
+              <div class="relative">
+                <span class="absolute left-3 top-2.5 font-extrabold text-salvia">$</span>
+                <input type="number" id="formMatPrecioCompraUSD" value="0.00" min="0" step="any" oninput="calcularCostosFormMaterial()" class="w-full pl-7 pr-3 py-2 bg-white border-2 border-choco rounded-xl font-extrabold text-choco text-sm focus:border-caramelo outline-none">
+              </div>
+            </div>
+
+            <!-- Resumen calculado en vivo -->
+            <div class="p-2.5 bg-white rounded-xl border border-huesoBorde space-y-1">
+              <div class="flex justify-between items-center">
+                <span class="text-[11px] font-bold text-slate-600">Costo Unitario:</span>
+                <span id="badgeCostoPorUnidad" class="font-extrabold text-salvia text-xs">$0.0000 / Kg.</span>
+              </div>
+              <div class="flex justify-between items-center text-[10px] text-slate-500">
+                <span id="labelCostoGramo">Costo por gramo / ml:</span>
+                <span id="badgeCostoPorGramo" class="font-bold text-choco">$0.000000</span>
+              </div>
+              <div class="flex justify-between items-center text-[10px] text-slate-500">
+                <span>Costo en Bolívares:</span>
+                <span id="badgeCostoBs" class="font-bold text-slate-700">Bs. 0.00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stock y Niveles de Alerta -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-choco mb-1">Stock Actual en Sistema <span class="text-[10px] text-slate-400 font-normal">(en la unidad de medida)</span></label>
+            <input type="number" id="formMatStockSoftware" value="0" step="any" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-extrabold text-choco focus:border-choco outline-none">
+          </div>
+          <div>
+            <label class="block font-bold text-choco mb-1">Stock Mínimo de Seguridad <span class="text-[10px] text-slate-400 font-normal">(Alerta si baja de esto)</span></label>
+            <input type="number" id="formMatStockMinimo" value="5.0" step="any" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl font-extrabold text-choco focus:border-choco outline-none">
+          </div>
+        </div>
+
+        <!-- Descripción o Notas -->
+        <div>
+          <label class="block font-bold text-choco mb-1">Descripción / Notas Adicionales <span class="text-[10px] text-slate-400 font-normal">(Opcional)</span></label>
+          <input type="text" id="formMatDescripcion" placeholder="Ej: Bolsa / Envase de 18.0 Lt. Proveedor preferido: KROPAN" class="w-full p-2.5 border border-slate-300 rounded-xl font-semibold text-slate-700 focus:border-choco outline-none">
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-3.5 bg-slate-50 border-t border-slate-200 flex justify-between items-center shrink-0">
+        <button type="button" id="btnEliminarDesdeModal" onclick="eliminarMaterialDesdeModal()" class="hidden px-3.5 py-2 bg-red-100 text-red-700 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5">
+          <i data-lucide="trash-2" class="w-4 h-4"></i>
+          <span>Eliminar Ítem</span>
+        </button>
+        <div class="flex items-center gap-2 ml-auto">
+          <button type="button" onclick="cerrarModalMaterial()" class="px-4 py-2 bg-hueso text-choco font-bold rounded-xl text-xs hover:bg-slate-200 transition">Cancelar</button>
+          <button type="button" onclick="guardarMaterialInventario()" class="px-5 py-2 bg-salvia text-huesoClaro font-extrabold rounded-xl text-xs hover:brightness-105 shadow transition flex items-center gap-1.5">
+            <i data-lucide="check" class="w-4 h-4"></i>
+            <span>Guardar Material</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= MODAL 3: MATERIALES Y PRESENTACIONES RÁPIDAS ================= -->
   <div id="modalMaestroMateriales" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 no-print">
     <div class="bg-white w-full max-w-xl rounded-3xl shadow-2xl p-5 space-y-3.5 text-xs">
       <div class="flex justify-between items-center border-b border-slate-200 pb-2">
@@ -869,6 +1049,9 @@
         <div>
           <label class="block font-bold mb-1">Material</label>
           <select id="maestroItemSelect" onchange="cargarItemEnMaestro()" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl font-bold"></select>
+          <button type="button" onclick="document.getElementById('modalMaestroMateriales').classList.add('hidden'); abrirModalEditarMaterial(document.getElementById('maestroItemSelect').value);" class="text-[11px] font-extrabold text-salvia underline flex items-center gap-1 mt-1.5 hover:text-emerald-700">
+            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Ver y editar ficha completa (Precios, Stock, Categoría)
+          </button>
         </div>
         <div>
           <label class="block font-bold mb-1">Nombre</label>
@@ -1488,61 +1671,515 @@
     // =========================================================================
     // MÓDULO 2: INVENTARIO, COMPRAS MIXTAS ($ + BS), PROVEEDORES CRUD Y BITÁCORA EDITABLE
     // =========================================================================
+    function guardarInventarioStorage() {
+      try {
+        localStorage.setItem("dyd_inventario_custom", JSON.stringify(state.inventario));
+      } catch (e) {
+        console.error("Error al guardar inventario en localStorage", e);
+      }
+    }
+
+    function renderizarBotonesCategoriasInv() {
+      const cont = document.getElementById("filtroCategoriasInvContainer");
+      if (!cont) return;
+
+      const cats = [
+        { codigo: "TODOS", label: "Todos", emoji: "📦" },
+        { codigo: "MATERIA_PRIMA", label: "Materia Prima", emoji: "🌾" },
+        { codigo: "EMPAQUE", label: "Empaque", emoji: "🏷️" },
+        { codigo: "LIMPIEZA", label: "Limpieza", emoji: "🧼" },
+        { codigo: "ACTIVOS_PLANTA", label: "Cestas y Bandejas", emoji: "🧺" },
+        { codigo: "PRODUCTO_TERMINADO", label: "Pan Terminado", emoji: "🥖" },
+        { codigo: "REVENTA_MAKILA", label: "Reventa", emoji: "🥟" }
+      ];
+
+      cont.innerHTML = cats.map(c => {
+        const cant = c.codigo === "TODOS" 
+          ? state.inventario.length 
+          : state.inventario.filter(it => it.categoriaCodigo === c.codigo).length;
+        const activo = state.filtroCatInv === c.codigo;
+        return `
+          <button onclick="setCatInv('${c.codigo}')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1 ${activo ? 'bg-choco text-hueso shadow-sm' : 'bg-hueso text-choco hover:bg-slate-200'}">
+            <span>${c.emoji}</span>
+            <span>${c.label}</span>
+            <span class="opacity-80 text-[11px]">(${cant})</span>
+          </button>
+        `;
+      }).join("");
+    }
+
     function setCatInv(cat) {
       state.filtroCatInv = cat;
       renderizarInventario();
     }
+
+    function actualizarPlaceholderMatSku() {
+      const cat = document.getElementById("formMatCategoria").value;
+      const prefijos = {
+        MATERIA_PRIMA: "MP",
+        EMPAQUE: "EMP",
+        LIMPIEZA: "LIMP",
+        ACTIVOS_PLANTA: "ACT",
+        PRODUCTO_TERMINADO: "PRD",
+        REVENTA_MAKILA: "REV"
+      };
+      const pref = prefijos[cat] || "MAT";
+      const skuInput = document.getElementById("formMatSku");
+      const isEditing = !!document.getElementById("formMatId").value;
+      
+      if (!isEditing && (!skuInput.value || skuInput.value.match(/^(MP|EMP|LIMP|ACT|PRD|REV)-\d+$/))) {
+        let maxNum = 0;
+        state.inventario.forEach(it => {
+          const code = it.sku || it.id || "";
+          const match = code.match(new RegExp(`^${pref}-(\\d+)`));
+          if (match) {
+            const n = parseInt(match[1], 10);
+            if (n > maxNum) maxNum = n;
+          }
+        });
+        const nextCode = `${pref}-${String(maxNum + 1).padStart(3, '0')}`;
+        skuInput.value = nextCode;
+        skuInput.placeholder = nextCode;
+      }
+    }
+
+    function calcularCostosFormMaterial() {
+      const empaqueTam = Math.max(0.0001, parseFloat(document.getElementById("formMatEmpaqueTam")?.value || 1));
+      const precioCompra = Math.max(0, parseFloat(document.getElementById("formMatPrecioCompraUSD")?.value || 0));
+      const unidad = document.getElementById("formMatUnidadMedida")?.value || "Kg.";
+      
+      const precioPorUnidad = +(precioCompra / empaqueTam).toFixed(4);
+      const esKgOlt = (unidad === "Kg." || unidad === "Lt.");
+      const costoPorGramo = esKgOlt ? +(precioPorUnidad / 1000.0).toFixed(6) : +precioPorUnidad.toFixed(6);
+      const tasa = state.tasaUsdBcv || 854.46;
+      const precioBs = +(precioCompra * tasa).toFixed(2);
+      const unitBs = +(precioPorUnidad * tasa).toFixed(2);
+
+      const badgeUnidad = document.getElementById("badgeCostoPorUnidad");
+      if (badgeUnidad) badgeUnidad.innerText = `$${precioPorUnidad.toFixed(4)} / ${unidad}`;
+
+      const lblGramo = document.getElementById("labelCostoGramo");
+      if (lblGramo) {
+        if (unidad === "Kg.") lblGramo.innerText = "Costo por gramo (gr):";
+        else if (unidad === "Lt.") lblGramo.innerText = "Costo por mililitro (ml):";
+        else lblGramo.innerText = `Costo por unidad (${unidad}):`;
+      }
+
+      const badgeGramo = document.getElementById("badgeCostoPorGramo");
+      if (badgeGramo) badgeGramo.innerText = `$${costoPorGramo.toFixed(6)}`;
+
+      const badgeBs = document.getElementById("badgeCostoBs");
+      if (badgeBs) badgeBs.innerText = `Bs. ${precioBs.toLocaleString('es-VE', {minimumFractionDigits: 2})} (Bs. ${unitBs.toFixed(2)}/${unidad})`;
+      
+      const spanTasa = document.getElementById("formMatTasaBcvSpan");
+      if (spanTasa) spanTasa.innerText = `Bs. ${tasa.toFixed(2)}`;
+    }
+
+    function abrirModalCrearMaterial() {
+      const tit = document.getElementById("modalMatTitulo");
+      if (tit) tit.innerHTML = `➕ Nuevo Material / Ítem`;
+      
+      document.getElementById("formMatId").value = "";
+      document.getElementById("formMatCategoria").value = (state.filtroCatInv !== "TODOS" && state.filtroCatInv) ? state.filtroCatInv : "MATERIA_PRIMA";
+      
+      document.getElementById("formMatSku").value = "";
+      actualizarPlaceholderMatSku();
+      
+      document.getElementById("formMatNombre").value = "";
+      document.getElementById("formMatPresentacionTipo").value = "Bolsa / Envase";
+      document.getElementById("formMatEmpaqueTam").value = "1.0";
+      document.getElementById("formMatUnidadMedida").value = "Kg.";
+      document.getElementById("formMatPrecioCompraUSD").value = "0.00";
+      document.getElementById("formMatStockSoftware").value = "0";
+      document.getElementById("formMatStockMinimo").value = "5.0";
+      document.getElementById("formMatDescripcion").value = "";
+      
+      const btnEliminar = document.getElementById("btnEliminarDesdeModal");
+      if (btnEliminar) btnEliminar.classList.add("hidden");
+
+      calcularCostosFormMaterial();
+      document.getElementById("modalCrearEditarMaterial").classList.remove("hidden");
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function abrirModalEditarMaterial(id) {
+      const it = state.inventario.find(x => x.id === id);
+      if (!it) {
+        alert("Material no encontrado.");
+        return;
+      }
+
+      const tit = document.getElementById("modalMatTitulo");
+      if (tit) tit.innerHTML = `✏️ Editar: ${it.nombre}`;
+
+      document.getElementById("formMatId").value = it.id;
+      document.getElementById("formMatCategoria").value = it.categoriaCodigo || "MATERIA_PRIMA";
+      document.getElementById("formMatSku").value = it.sku || it.id || "";
+      document.getElementById("formMatNombre").value = it.nombre || "";
+
+      const presSelect = document.getElementById("formMatPresentacionTipo");
+      const presVal = it.presentacionTipo || "Bolsa / Envase";
+      let exists = false;
+      for (let i = 0; i < presSelect.options.length; i++) {
+        if (presSelect.options[i].value === presVal) {
+          exists = true;
+          break;
+        }
+      }
+      if (!exists) {
+        const opt = document.createElement("option");
+        opt.value = presVal;
+        opt.textContent = presVal;
+        presSelect.appendChild(opt);
+      }
+      presSelect.value = presVal;
+
+      document.getElementById("formMatEmpaqueTam").value = it.empaqueTam !== undefined ? it.empaqueTam : 1.0;
+      document.getElementById("formMatUnidadMedida").value = it.unidadMedida || "Kg.";
+      
+      const prec = it.precioCompraUSD !== undefined && it.precioCompraUSD !== null 
+        ? parseFloat(it.precioCompraUSD) 
+        : (parseFloat(it.precioPorUnidad || 0) * parseFloat(it.empaqueTam || 1));
+      document.getElementById("formMatPrecioCompraUSD").value = prec.toFixed(2);
+
+      document.getElementById("formMatStockSoftware").value = it.stockSoftware !== undefined ? it.stockSoftware : 0;
+      document.getElementById("formMatStockMinimo").value = it.stockMinimo !== undefined ? it.stockMinimo : 5.0;
+      document.getElementById("formMatDescripcion").value = it.descripcion || "";
+
+      const btnEliminar = document.getElementById("btnEliminarDesdeModal");
+      if (btnEliminar) btnEliminar.classList.remove("hidden");
+
+      calcularCostosFormMaterial();
+      document.getElementById("modalCrearEditarMaterial").classList.remove("hidden");
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function cerrarModalMaterial() {
+      document.getElementById("modalCrearEditarMaterial").classList.add("hidden");
+    }
+
+    function agregarNuevoTipoPresentacionForm() {
+      const nuevo = prompt("Nombre del nuevo tipo de empaque o presentación (ej: Paila 18L, Tambor 200L, Caja Master):");
+      if (nuevo && nuevo.trim()) {
+        const nTrim = nuevo.trim();
+        if (!state.tiposPresentacion.includes(nTrim)) {
+          state.tiposPresentacion.push(nTrim);
+        }
+        const sel = document.getElementById("formMatPresentacionTipo");
+        let exists = false;
+        for (let i = 0; i < sel.options.length; i++) {
+          if (sel.options[i].value === nTrim) { exists = true; break; }
+        }
+        if (!exists) {
+          const opt = document.createElement("option");
+          opt.value = nTrim;
+          opt.textContent = nTrim;
+          sel.appendChild(opt);
+        }
+        sel.value = nTrim;
+      }
+    }
+
+    function guardarMaterialInventario() {
+      const idHidden = document.getElementById("formMatId").value.trim();
+      const nombre = document.getElementById("formMatNombre").value.trim();
+      if (!nombre) {
+        alert("Por favor ingresa el nombre del material o producto.");
+        document.getElementById("formMatNombre").focus();
+        return;
+      }
+
+      const categoriaCodigo = document.getElementById("formMatCategoria").value;
+      const catNombres = {
+        MATERIA_PRIMA: "1. Materia Prima Directa (Ingredientes)",
+        EMPAQUE: "2. Material de Empaque y Etiquetado (Bolsas/Precintos/Calcomanías)",
+        LIMPIEZA: "3. Suministros de Limpieza y Planta",
+        ACTIVOS_PLANTA: "4. Suministros de Planta: Cestas y Bandejas",
+        PRODUCTO_TERMINADO: "5. Productos Terminados (Fabricación Propia)",
+        REVENTA_MAKILA: "6. Productos Comprados para Reventa (Makila/Tequeños)"
+      };
+      const categoriaNombre = catNombres[categoriaCodigo] || categoriaCodigo;
+
+      const sku = document.getElementById("formMatSku").value.trim() || idHidden;
+      const presentacionTipo = document.getElementById("formMatPresentacionTipo").value;
+      const empaqueTam = Math.max(0.0001, parseFloat(document.getElementById("formMatEmpaqueTam").value || 1));
+      const unidadMedida = document.getElementById("formMatUnidadMedida").value;
+      const precioCompraUSD = Math.max(0, parseFloat(document.getElementById("formMatPrecioCompraUSD").value || 0));
+      const precioPorUnidad = +(precioCompraUSD / empaqueTam).toFixed(4);
+      const esKgOlt = (unidadMedida === "Kg." || unidadMedida === "Lt.");
+      const costoPorGramoUSD = esKgOlt ? +(precioPorUnidad / 1000.0).toFixed(6) : +precioPorUnidad.toFixed(6);
+
+      const stockSoftware = parseFloat(document.getElementById("formMatStockSoftware").value || 0);
+      const stockMinimo = parseFloat(document.getElementById("formMatStockMinimo").value || 0);
+      const descripcion = document.getElementById("formMatDescripcion").value.trim() || `${presentacionTipo} de ${empaqueTam} ${unidadMedida}`;
+
+      if (idHidden) {
+        const it = state.inventario.find(x => x.id === idHidden);
+        if (!it) {
+          alert("Error: No se encontró el ítem a modificar.");
+          return;
+        }
+        const nombreAntiguo = it.nombre;
+        it.nombre = nombre;
+        it.sku = sku || it.sku || idHidden;
+        it.categoriaCodigo = categoriaCodigo;
+        it.categoriaNombre = categoriaNombre;
+        it.presentacionTipo = presentacionTipo;
+        it.empaqueTam = empaqueTam;
+        it.unidadMedida = unidadMedida;
+        it.precioCompraUSD = precioCompraUSD;
+        it.precioPorUnidad = precioPorUnidad;
+        it.costoPorGramoUSD = costoPorGramoUSD;
+        it.stockSoftware = stockSoftware;
+        it.stockMinimo = stockMinimo;
+        it.descripcion = descripcion;
+
+        if (nombreAntiguo !== nombre) {
+          state.productos.forEach(p => {
+            if (Array.isArray(p.ingredientes)) {
+              p.ingredientes.forEach(ing => {
+                if (ing.materiaPrimaId === idHidden) ing.nombre = nombre;
+              });
+            }
+            if (Array.isArray(p.elementosEmpaque)) {
+              p.elementosEmpaque.forEach(emp => {
+                if (emp.itemId === idHidden) emp.nombre = nombre;
+              });
+            }
+          });
+        }
+
+        state.bitacoraInventario.unshift({
+          id: "bit-" + Date.now(),
+          fecha: new Date().toLocaleString(),
+          tipo: "EDICIÓN MATERIAL",
+          itemNombre: nombre,
+          cantidad: stockSoftware,
+          metodoPago: "Ficha Técnica",
+          detallePago: `Actualizado: ${presentacionTipo} ${empaqueTam}${unidadMedida} · $${precioCompraUSD}`,
+          soporte: "Módulo Inventario",
+          adjuntoNombre: "",
+          registradoPor: state.operadorActivo,
+          editadoPor: null
+        });
+      } else {
+        let finalId = sku;
+        if (!finalId || state.inventario.some(x => x.id === finalId)) {
+          finalId = (sku ? sku + "-" : "ITM-") + Date.now();
+        }
+        const nuevoItem = {
+          id: finalId,
+          sku: sku || finalId,
+          nombre: nombre,
+          categoriaCodigo: categoriaCodigo,
+          categoriaNombre: categoriaNombre,
+          empaqueTam: empaqueTam,
+          presentacionTipo: presentacionTipo,
+          unidadMedida: unidadMedida,
+          descripcion: descripcion,
+          precioCompraUSD: precioCompraUSD,
+          precioPorUnidad: precioPorUnidad,
+          costoPorGramoUSD: costoPorGramoUSD,
+          stockSoftware: stockSoftware,
+          stockApartado: 0.0,
+          stockMinimo: stockMinimo
+        };
+        state.inventario.unshift(nuevoItem);
+
+        state.bitacoraInventario.unshift({
+          id: "bit-" + Date.now(),
+          fecha: new Date().toLocaleString(),
+          tipo: "CREACIÓN MATERIAL",
+          itemNombre: nombre,
+          cantidad: stockSoftware,
+          metodoPago: "Alta de Ítem",
+          detallePago: `Creado en ${categoriaNombre} · ${presentacionTipo} ${empaqueTam}${unidadMedida} · $${precioCompraUSD}`,
+          soporte: "Módulo Inventario",
+          adjuntoNombre: "",
+          registradoPor: state.operadorActivo,
+          editadoPor: null
+        });
+      }
+
+      guardarInventarioStorage();
+      recalcularCostosRecetasDesdePreciosMP();
+      cerrarModalMaterial();
+      renderizarTodo();
+    }
+
+    function eliminarMaterialInventario(id) {
+      const it = state.inventario.find(x => x.id === id);
+      if (!it) return;
+
+      const recetasAfectadas = state.productos.filter(p => 
+        (p.ingredientes && p.ingredientes.some(i => i.materiaPrimaId === id || i.nombre === it.nombre)) ||
+        (p.elementosEmpaque && p.elementosEmpaque.some(e => e.itemId === id || e.nombre === it.nombre))
+      );
+
+      let advertencia = `¿Estás seguro de que deseas eliminar permanentemente el material "${it.nombre}"?`;
+      if (recetasAfectadas.length > 0) {
+        advertencia += `\n\n⚠️ ADVERTENCIA: Este material está vinculado a ${recetasAfectadas.length} receta(s) de panadería: (${recetasAfectadas.map(p => p.nombre).slice(0, 3).join(", ")}${recetasAfectadas.length > 3 ? '...' : ''}). Si lo eliminas, deberás actualizar los ingredientes de esas recetas.`;
+      }
+
+      if (!confirm(advertencia)) return;
+
+      state.inventario = state.inventario.filter(x => x.id !== id);
+
+      state.bitacoraInventario.unshift({
+        id: "bit-" + Date.now(),
+        fecha: new Date().toLocaleString(),
+        tipo: "ELIMINACIÓN MATERIAL",
+        itemNombre: it.nombre,
+        cantidad: it.stockSoftware || 0,
+        metodoPago: "Baja de Inventario",
+        detallePago: `Material eliminado permanentemente del sistema`,
+        soporte: "Módulo Inventario",
+        adjuntoNombre: "",
+        registradoPor: state.operadorActivo,
+        editadoPor: null
+      });
+
+      guardarInventarioStorage();
+      recalcularCostosRecetasDesdePreciosMP();
+      cerrarModalMaterial();
+      renderizarTodo();
+    }
+
+    function eliminarMaterialDesdeModal() {
+      const id = document.getElementById("formMatId").value;
+      if (id) eliminarMaterialInventario(id);
+    }
+
     function activarModoRevisionFisica() {
       state.modoRevisionFisica = true;
       document.getElementById("barraConfirmarRevisionFisica").classList.remove("hidden");
       document.getElementById("responsableRevisionInput").value = state.operadorActivo;
       renderizarInventario();
     }
+
     function salirModoRevisionFisica() {
       state.modoRevisionFisica = false;
       document.getElementById("barraConfirmarRevisionFisica").classList.add("hidden");
       renderizarInventario();
     }
+
     function renderizarInventario() {
-      const q = (document.getElementById("buscarInvInput")?.value || "").toLowerCase();
+      const q = (document.getElementById("buscarInvInput")?.value || "").toLowerCase().trim();
       const cont = document.getElementById("listaInventarioContainer");
       if (!cont) return;
 
+      renderizarBotonesCategoriasInv();
+
       const filtrados = state.inventario.filter(it => {
         if (state.filtroCatInv !== "TODOS" && it.categoriaCodigo !== state.filtroCatInv) return false;
-        if (q && !it.nombre.toLowerCase().includes(q) && !(it.presentacionTipo||"").toLowerCase().includes(q)) return false;
-        return true;
+        if (!q) return true;
+        const nombre = (it.nombre || "").toLowerCase();
+        const sku = (it.sku || it.id || "").toLowerCase();
+        const pres = (it.presentacionTipo || "").toLowerCase();
+        const desc = (it.descripcion || "").toLowerCase();
+        return nombre.includes(q) || sku.includes(q) || pres.includes(q) || desc.includes(q);
       });
 
-      cont.innerHTML = filtrados.slice(0, 45).map(it => {
+      if (filtrados.length === 0) {
+        cont.innerHTML = `
+          <div class="bg-white p-8 rounded-2xl border border-dashed border-slate-300 text-center space-y-3">
+            <div class="w-12 h-12 rounded-full bg-hueso flex items-center justify-center mx-auto text-choco">
+              <i data-lucide="package-x" class="w-6 h-6"></i>
+            </div>
+            <h4 class="font-extrabold text-sm text-choco">No se encontraron materiales</h4>
+            <p class="text-xs text-slate-500 max-w-sm mx-auto">No hay ningún material o producto que coincida con los criterios de búsqueda o categoría actual.</p>
+            <div class="flex justify-center gap-2 pt-2">
+              <button onclick="document.getElementById('buscarInvInput').value=''; setCatInv('TODOS');" class="px-3 py-1.5 bg-hueso text-choco rounded-xl text-xs font-bold hover:bg-slate-200">Limpiar Filtros</button>
+              <button onclick="abrirModalCrearMaterial()" class="px-3.5 py-1.5 bg-salvia text-huesoClaro rounded-xl text-xs font-extrabold shadow hover:brightness-105">➕ Crear Nuevo Material</button>
+            </div>
+          </div>
+        `;
+        renderizarBitacoraInventario();
+        if (window.lucide) lucide.createIcons();
+        return;
+      }
+
+      const catBadges = {
+        MATERIA_PRIMA: "bg-amber-50 text-amber-900 border-amber-200",
+        EMPAQUE: "bg-blue-50 text-blue-900 border-blue-200",
+        LIMPIEZA: "bg-emerald-50 text-emerald-900 border-emerald-200",
+        ACTIVOS_PLANTA: "bg-orange-50 text-orange-900 border-orange-200",
+        PRODUCTO_TERMINADO: "bg-purple-50 text-purple-900 border-purple-200",
+        REVENTA_MAKILA: "bg-teal-50 text-teal-900 border-teal-200"
+      };
+
+      const contadorHeader = `
+        <div class="flex items-center justify-between text-[11px] font-bold text-slate-500 px-1 pb-1">
+          <span>Mostrando <strong>${filtrados.length}</strong> de ${state.inventario.length} materiales e ítems</span>
+          <span class="text-[10px] text-choco font-semibold">Tasa BCV: <strong>Bs. ${(state.tasaUsdBcv||854.46).toFixed(2)}</strong></span>
+        </div>
+      `;
+
+      cont.innerHTML = contadorHeader + filtrados.map(it => {
         const stockSoft = parseFloat(it.stockSoftware || 0);
         const apartado = parseFloat(it.stockApartado || 0);
         const libre = +(stockSoft - apartado).toFixed(2);
         const fisico = typeof it.tempFisico === "number" ? it.tempFisico : stockSoft;
+        const tam = parseFloat(it.empaqueTam || 1);
+        const precioComp = it.precioCompraUSD !== undefined && it.precioCompraUSD !== null 
+          ? parseFloat(it.precioCompraUSD) 
+          : (parseFloat(it.precioPorUnidad || 0) * tam);
+        const precioUnit = parseFloat(it.precioPorUnidad || (tam > 0 ? precioComp / tam : 0));
+        const badgeColor = catBadges[it.categoriaCodigo] || "bg-slate-100 text-slate-700 border-slate-200";
 
         return `
-          <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <span class="text-[10px] font-extrabold text-choco bg-hueso px-2 py-0.5 rounded">${it.presentacionTipo || 'Empaque'} · ${it.empaqueTam} ${it.unidadMedida}</span>
-              <h4 class="font-extrabold text-xs sm:text-sm text-choco mt-0.5">${it.nombre}</h4>
-            </div>
-            <div class="flex items-center gap-3">
-              <div class="text-right">
-                <span class="block text-[10px] text-slate-500 font-bold">Sistema: ${stockSoft} · Apartado: <strong>${apartado}</strong></span>
-                <span class="font-extrabold text-xs sm:text-sm ${libre <= it.stockMinimo ? 'text-red-600' : 'text-salvia'}">Disponible: ${libre} ${it.unidadMedida}</span>
+          <div class="bg-white p-3 sm:p-3.5 rounded-2xl shadow-sm border border-slate-200 hover:border-caramelo/50 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="space-y-1 max-w-xl">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="text-[10px] font-extrabold text-choco bg-hueso px-2 py-0.5 rounded-md border border-huesoBorde">
+                  📦 ${it.presentacionTipo || 'Empaque'} · ${tam} ${it.unidadMedida}
+                </span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-md border ${badgeColor}">
+                  ${it.sku || it.id}
+                </span>
+                ${precioComp > 0 ? `
+                  <span class="text-[10px] font-extrabold text-salvia bg-salvia/10 px-2 py-0.5 rounded-md border border-salvia/20">
+                    $${precioComp.toFixed(2)} ($${precioUnit.toFixed(3)}/${it.unidadMedida})
+                  </span>
+                ` : ''}
               </div>
+              <h4 class="font-extrabold text-xs sm:text-sm text-choco tracking-tight">${it.nombre}</h4>
+              ${it.descripcion ? `<p class="text-[11px] text-slate-500 font-medium">${it.descripcion}</p>` : ''}
+            </div>
+
+            <div class="flex items-center gap-2 sm:gap-3 shrink-0 flex-wrap sm:flex-nowrap justify-between sm:justify-end border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100">
+              <div class="text-left sm:text-right">
+                <span class="block text-[10px] text-slate-500 font-bold">Sistema: <strong>${stockSoft}</strong> · Apartado: <strong>${apartado}</strong></span>
+                <span class="font-extrabold text-xs sm:text-sm ${libre <= (it.stockMinimo || 5) ? 'text-red-600' : 'text-salvia'}">
+                  ${libre <= (it.stockMinimo || 5) ? '⚠️ ' : '✅ '}Disponible: ${libre} ${it.unidadMedida}
+                </span>
+              </div>
+
               ${state.modoRevisionFisica ? `
-                <div class="bg-hueso p-1.5 rounded-xl border border-huesoBorde">
-                  <span class="block text-[9px] font-bold text-choco uppercase">Físico</span>
-                  <input type="number" value="${fisico}" step="0.1" oninput="registrarTempFisico('${it.id}', this.value)" class="w-18 p-1 bg-white border border-huesoBorde rounded font-extrabold text-center text-xs">
+                <div class="bg-hueso p-1.5 rounded-xl border border-huesoBorde flex items-center gap-1.5">
+                  <div>
+                    <span class="block text-[9px] font-bold text-choco uppercase">Físico</span>
+                    <input type="number" value="${fisico}" step="0.1" oninput="registrarTempFisico('${it.id}', this.value)" class="w-20 p-1 bg-white border border-huesoBorde rounded font-extrabold text-center text-xs">
+                  </div>
                 </div>
-              ` : ''}
+              ` : `
+                <div class="flex items-center gap-1.5">
+                  <button onclick="abrirModalEditarMaterial('${it.id}')" title="Editar ficha completa" class="px-2.5 py-1.5 rounded-xl bg-hueso hover:bg-caramelo text-choco hover:text-white font-extrabold text-xs transition flex items-center gap-1 shadow-sm">
+                    <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                    <span>Editar</span>
+                  </button>
+                  <button onclick="eliminarMaterialInventario('${it.id}')" title="Eliminar del inventario" class="p-1.5 rounded-xl bg-red-50 hover:bg-red-600 text-red-600 hover:text-white font-bold text-xs transition flex items-center justify-center shadow-sm">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                  </button>
+                </div>
+              `}
             </div>
           </div>
         `;
       }).join("");
 
       renderizarBitacoraInventario();
+      if (window.lucide) lucide.createIcons();
     }
 
     function registrarTempFisico(id, val) {
@@ -1557,14 +2194,15 @@
         if (typeof it.tempFisico === "number" && it.tempFisico !== it.stockSoftware) {
           const ant = it.stockSoftware;
           it.stockSoftware = it.tempFisico;
+          delete it.tempFisico;
           state.bitacoraInventario.unshift({
             id: "bit-" + Date.now() + "-" + cambios,
             fecha: new Date().toLocaleString(),
             tipo: "CONTEO FÍSICO",
             itemNombre: it.nombre,
-            cantidad: it.tempFisico,
+            cantidad: it.stockSoftware,
             metodoPago: "Ajuste Físico",
-            detallePago: `${ant} → ${it.tempFisico} ${it.unidadMedida}`,
+            detallePago: `${ant} → ${it.stockSoftware} ${it.unidadMedida}`,
             soporte: "Conteo de Planta",
             adjuntoNombre: "",
             registradoPor: resp,
@@ -1573,6 +2211,7 @@
           cambios++;
         }
       });
+      guardarInventarioStorage();
       salirModoRevisionFisica();
       renderizarTodo();
     }
@@ -1640,6 +2279,7 @@
         editadoPor: null
       });
 
+      guardarInventarioStorage();
       document.getElementById("modalCompraCompleta").classList.add("hidden");
       renderizarTodo();
     }
@@ -1690,13 +2330,19 @@
       document.getElementById("maestroNombre").value = it.nombre;
       document.getElementById("maestroTamano").value = it.empaqueTam || 50;
       document.getElementById("maestroDescripcion").value = it.descripcion || "";
+      if (it.presentacionTipo) {
+        document.getElementById("maestroTipoEmpaque").value = it.presentacionTipo;
+      }
     }
     function agregarTipoEmpaqueMaestro() {
       const nuevo = prompt("Nuevo tipo de empaque:");
-      if (nuevo) {
-        state.tiposPresentacion.push(nuevo);
+      if (nuevo && nuevo.trim()) {
+        const nTrim = nuevo.trim();
+        if (!state.tiposPresentacion.includes(nTrim)) {
+          state.tiposPresentacion.push(nTrim);
+        }
         document.getElementById("maestroTipoEmpaque").innerHTML = state.tiposPresentacion.map(t => `<option value="${t}">${t}</option>`).join("");
-        document.getElementById("maestroTipoEmpaque").value = nuevo;
+        document.getElementById("maestroTipoEmpaque").value = nTrim;
       }
     }
     function guardarCambiosMaestroMaterial() {
@@ -1704,10 +2350,17 @@
       const it = state.inventario.find(x => x.id === id);
       if (it) {
         it.nombre = document.getElementById("maestroNombre").value.trim() || it.nombre;
-        it.empaqueTam = parseFloat(document.getElementById("maestroTamano").value || 50);
+        it.empaqueTam = Math.max(0.0001, parseFloat(document.getElementById("maestroTamano").value || 50));
         it.presentacionTipo = document.getElementById("maestroTipoEmpaque").value;
         it.descripcion = document.getElementById("maestroDescripcion").value;
+        if (it.precioCompraUSD && it.empaqueTam > 0) {
+          it.precioPorUnidad = +(it.precioCompraUSD / it.empaqueTam).toFixed(4);
+          const esKgOlt = (it.unidadMedida === "Kg." || it.unidadMedida === "Lt.");
+          it.costoPorGramoUSD = esKgOlt ? +(it.precioPorUnidad / 1000.0).toFixed(6) : +it.precioPorUnidad.toFixed(6);
+        }
       }
+      guardarInventarioStorage();
+      recalcularCostosRecetasDesdePreciosMP();
       document.getElementById("modalMaestroMateriales").classList.add("hidden");
       renderizarTodo();
     }
@@ -1776,17 +2429,18 @@
       if (!it) return;
       const val = Math.max(0.0001, parseFloat(valorStr || 0));
       const tamActual = Math.max(0.01, parseFloat(it.empaqueTam || 1));
-      const precioUnitActual = parseFloat(it.precioPorUnidad || 1);
 
       if (campo === "TAMANO") {
         it.empaqueTam = val;
       } else if (campo === "PRECIO_SACO") {
+        it.precioCompraUSD = val;
         it.precioPorUnidad = +(val / tamActual).toFixed(5);
       }
 
       const esKg = (it.unidadMedida || "").toUpperCase().includes("KG");
       it.costoPorGramoUSD = esKg ? (it.precioPorUnidad / 1000.0) : it.precioPorUnidad;
 
+      guardarInventarioStorage();
       recalcularCostosRecetasDesdePreciosMP();
       renderizarListaPreciosMP();
       renderizarTodo();
@@ -2628,6 +3282,13 @@
 
     window.addEventListener("DOMContentLoaded", () => {
       try {
+        const invGuardado = JSON.parse(localStorage.getItem("dyd_inventario_custom") || "null");
+        if (Array.isArray(invGuardado) && invGuardado.length > 0) {
+          state.inventario = invGuardado;
+        }
+      } catch (e) {}
+
+      try {
         const cache = JSON.parse(localStorage.getItem("dyd_tasas_bcv_2026") || "null");
         if (cache && cache.usd > 0 && cache.eur > 0) {
           state.tasaUsdBcv = parseFloat(cache.usd);
@@ -2637,6 +3298,7 @@
         }
       } catch (e) {}
 
+      recalcularCostosRecetasDesdePreciosMP();
       inicializarCanvasFirma();
       renderizarTodo();
 
